@@ -34,6 +34,27 @@ export default function Layout() {
           }}
         />
         <Drawer.Screen
+          name="numberline"
+          options={{
+            drawerLabel: "NumberLine",
+            title: "NumberLine",
+          }}
+        />
+        <Drawer.Screen
+          name="compdecimals"
+          options={{
+            drawerLabel: "Comparing Decimals",
+            title: "Comparing Decimals",
+          }}
+        />
+        <Drawer.Screen
+          name="commonfractions"
+          options={{
+            drawerLabel: "Common Fractions",
+            title: "Common Fractions",
+          }}
+        />
+        <Drawer.Screen
           name="settings"
           options={{
             drawerLabel: "Settings",
