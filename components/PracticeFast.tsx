@@ -48,8 +48,8 @@ export type OptionsData = {
   bottomDigits?: number;
 };
 
-const INTERVAL_TIME = 6000; //display Question
-const TIMEOUT_TIME = 4000; //display answer
+const INTERVAL_TIME = 4000; //display Question
+const TIMEOUT_TIME = 2000; //display answer
 
 const multiply = function* (): Generator<JSX.Element, void, unknown> {
   // Chose random number from 2 to 9 for numerator & denominator
@@ -85,7 +85,6 @@ export const PracticeFast = () => {
   };
 
   useEffect(() => {
-    console.log("load...123");
     let intervalId: unknown;
     let op: unknown;
 

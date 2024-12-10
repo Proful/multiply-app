@@ -16,8 +16,15 @@ export default function TimesTable() {
 
       fetchDigit();
 
+      const interval = setInterval(() => {
+        const randomNumber = Math.floor(Math.random() * 15) + 2;
+        setDigit(randomNumber);
+      }, 15000);
+
       // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
+      return () => {
+        clearInterval(interval);
+      };
     }, []), // Empty dependency array ensures this runs on focus
   );
   return (
@@ -32,11 +39,11 @@ export default function TimesTable() {
             justifyContent: "space-between",
           }}
         >
-          <Text style={{ fontSize: 28, width: 30, textAlign: "right" }}>
+          <Text style={{ fontSize: 26, width: 30, textAlign: "right" }}>
             {digit}
           </Text>
           <Text
-            style={{ fontSize: 28, width: 70, textAlign: "left" }}
+            style={{ fontSize: 26, width: 70, textAlign: "left" }}
           >{`x   ${i + 1}`}</Text>
           <Text style={{ fontSize: 28, width: 20, textAlign: "center" }}>
             =

@@ -1,11 +1,14 @@
 import { useFocusEffect } from "expo-router";
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, TextInput, Alert } from "react-native";
+import { View, Text, TextInput, Alert, Button } from "react-native";
 
 const MultiplicationChecker = () => {
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
+  const [carry, setCarry] = useState<string>("");
+  const [step1, setStep1] = useState<string>("");
+  const [step2, setStep2] = useState<string>("");
   const [result, setResult] = useState<string>("");
 
   // Generate random 2 digit number (10-99)
@@ -36,10 +39,8 @@ const MultiplicationChecker = () => {
 
     if (userValue === correctAnswer) {
       setResult("correct");
-      console.log("correct");
     } else {
       setResult("wrong");
-      console.log("wrong");
     }
   };
 
@@ -56,20 +57,40 @@ const MultiplicationChecker = () => {
       <View
         style={{
           flex: 1,
-          justifyContent: "center",
           alignItems: "center",
         }}
       >
-        {/* Line 1: First number */}
         <Text style={{ fontSize: 44 }}>{"    " + firstNumber}</Text>
 
-        {/* Line 2: Second number */}
         <Text style={{ fontSize: 44 }}>{"X " + secondNumber}</Text>
 
-        {/* Line 3: Divider */}
         <Text style={{ fontSize: 44 }}>-----------</Text>
 
-        {/* Line 4: Input field */}
+        <TextInput
+          style={{ fontSize: 20, width: "60%" }}
+          value={carry}
+          onChangeText={setCarry}
+          keyboardType="numeric"
+          placeholder="carry"
+        />
+
+        <TextInput
+          style={{ fontSize: 28, width: "60%" }}
+          value={step1}
+          onChangeText={setStep1}
+          keyboardType="numeric"
+          placeholder="Step 1"
+        />
+
+        <TextInput
+          style={{ fontSize: 28, width: "60%" }}
+          value={step2}
+          onChangeText={setStep2}
+          keyboardType="numeric"
+          placeholder="Step 2"
+        />
+        <Text style={{ fontSize: 44 }}>-----------</Text>
+
         <TextInput
           style={{ fontSize: 28, width: "60%" }}
           value={userAnswer}
@@ -78,8 +99,19 @@ const MultiplicationChecker = () => {
           placeholder="Enter your answer"
         />
       </View>
-      <View>
-        <Text style={{ fontSize: 24, marginTop: 24 }}>Result: {result}</Text>
+      <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
+        <Text>Result: {result}</Text>
+        <Button
+          onPress={() => {
+            setFirstNumber(generateTwoDigitNumber());
+            setSecondNumber(generateTwoDigitNumber());
+            setUserAnswer("");
+            setResult("");
+          }}
+          title="Reset"
+          color="#841584"
+          accessibilityLabel="Learn more about this purple button"
+        />
       </View>
     </View>
   );

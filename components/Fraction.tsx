@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-
+import Svg, { Line } from "react-native-svg";
 interface FractionProps {
   numerator: number;
   denominator: number;
@@ -11,19 +11,27 @@ const Fraction: React.FC<FractionProps> = ({ numerator, denominator }) => {
     <View style={styles.container}>
       <View style={{ alignItems: "center" }}>
         <Text style={styles.numerator}>{numerator}</Text>
-        <View style={styles.line} />
+        <LineExample />
+        {/* <View style={styles.line} /> */}
         <Text style={styles.denominator}>{denominator}</Text>
       </View>
     </View>
   );
 };
 
+const LineExample = () => (
+  <View>
+    <Svg height="10" width="50">
+      <Line x1="0" y1="10" x2="50" y2="10" stroke="blue" strokeWidth="2" />
+    </Svg>
+  </View>
+);
 const styles = StyleSheet.create({
   container: {
     alignItems: "flex-start",
   },
   numerator: {
-    fontSize: 14,
+    fontSize: 24,
     fontWeight: "bold",
   },
   line: {
@@ -33,7 +41,7 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   denominator: {
-    fontSize: 14,
+    fontSize: 24,
     fontWeight: "bold",
   },
 });

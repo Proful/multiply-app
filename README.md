@@ -36,3 +36,23 @@ npx expo install @react-native-async-storage/async-storage
 ```bash
 npx expo install @react-native-picker/picker
 ```
+
+## Local app development
+
+```sh
+npx expo run:android
+eas build --platform android --local --profile preview
+```
+
+```sh
+npx expo install expo-dev-client
+npm install -g eas-cli
+eas login
+eas build:configure
+```
+
+## build
+
+```sh
+eas build --profile development --platform android
+```

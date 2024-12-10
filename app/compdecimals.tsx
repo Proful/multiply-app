@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Button, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useEffect, useCallback } from "react";
 import RadioInput from "@/components/RadioInput";
@@ -30,7 +30,6 @@ export default function ComparingDecimals() {
       const tmp = generateTwoDigitNumber();
       const a = Number(tmp + "." + generateTwoDigitNumber());
       const b = Number(tmp + "." + generateTwoDigitNumber());
-      console.log(a, b);
       setFirstNumber(a);
       setSecondNumber(b);
       setUserAnswer("");
@@ -40,28 +39,46 @@ export default function ComparingDecimals() {
     }, []), // Empty dependency array ensures this runs on focus
   );
   return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
+    <>
       <View
         style={{
-          flexDirection: "row",
+          flex: 1,
+          alignItems: "center",
         }}
       >
-        <Text>
-          {firstNumber} ? {secondNumber}
-        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: 44 }}>
+            {firstNumber} ? {secondNumber}
+          </Text>
+        </View>
+        <RadioInput
+          options={[">", "<", "="]}
+          value={selectedOption}
+          onValueChange={handleRadioValueChange}
+        />
+        <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
+          <Text>Result: {result}</Text>
+          <Button
+            onPress={() => {
+              const tmp = generateTwoDigitNumber();
+              const a = Number(tmp + "." + generateTwoDigitNumber());
+              const b = Number(tmp + "." + generateTwoDigitNumber());
+              setFirstNumber(a);
+              setSecondNumber(b);
+              setUserAnswer("");
+              setResult("");
+              setSelectedOption("");
+            }}
+            title="Reset"
+            color="#841584"
+            accessibilityLabel="Learn more about this purple button"
+          />
+        </View>
       </View>
-      <RadioInput
-        options={[">", "<", "="]}
-        value={selectedOption}
-        onValueChange={handleRadioValueChange}
-      />
-      <View>
-        <Text>Result: {result}</Text>
-      </View>
-    </View>
+    </>
   );
 }
