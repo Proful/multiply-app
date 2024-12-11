@@ -36,51 +36,57 @@ export default function CommonDecimalToFractions() {
       }}
     >
       <Text style={{ fontSize: 44 }}>{firstNumber}</Text>
-      <View>
-        <Text style={{ fontSize: 24 }}>= </Text>
-        <TextInput
-          style={{ fontSize: 24 }}
-          placeholder={"Enter Numerator"}
-          value={numerator}
-          onChangeText={(txt) => {
-            setNumerator(txt);
-
-            if (txt && Number(denominator) !== 0) {
-              if (Number(txt) / Number(denominator) === firstNumber) {
-                setResult("correct");
-              } else {
-                setResult("wrong");
-              }
-            }
-          }}
-        />
+      <View
+        style={{
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: 24, marginTop: 45 }}>= </Text>
         <View>
-          <Svg height="10" width="200">
-            <Line
-              x1="0"
-              y1="10"
-              x2="200"
-              y2="10"
-              stroke="blue"
-              strokeWidth="2"
-            />
-          </Svg>
-        </View>
-        <TextInput
-          style={{ fontSize: 24 }}
-          placeholder={"Enter Denominator"}
-          value={denominator}
-          onChangeText={(txt) => {
-            setDenominator(txt);
-            if (txt && Number(txt) !== 0) {
-              if (Number(numerator) / Number(txt) === firstNumber) {
-                setResult("correct");
-              } else {
-                setResult("wrong");
+          <TextInput
+            style={{ fontSize: 24 }}
+            placeholder={"Enter Numerator"}
+            value={numerator}
+            onChangeText={(txt) => {
+              setNumerator(txt);
+
+              if (txt && Number(denominator) !== 0) {
+                if (Number(txt) / Number(denominator) === firstNumber) {
+                  setResult("correct");
+                } else {
+                  setResult("wrong");
+                }
               }
-            }
-          }}
-        />
+            }}
+          />
+          <View>
+            <Svg height="10" width="200">
+              <Line
+                x1="0"
+                y1="10"
+                x2="200"
+                y2="10"
+                stroke="black"
+                strokeWidth="2"
+              />
+            </Svg>
+          </View>
+          <TextInput
+            style={{ fontSize: 24 }}
+            placeholder={"Enter Denominator"}
+            value={denominator}
+            onChangeText={(txt) => {
+              setDenominator(txt);
+              if (txt && Number(txt) !== 0) {
+                if (Number(numerator) / Number(txt) === firstNumber) {
+                  setResult("correct");
+                } else {
+                  setResult("wrong");
+                }
+              }
+            }}
+          />
+        </View>
       </View>
       <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
         <Text>Result: {result}</Text>

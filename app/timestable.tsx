@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 
 import { useFocusEffect } from "@react-navigation/native";
 export default function TimesTable() {
-  const [digit, setDigit] = useState<number>(2); // Default value
+  const [digit, setDigit] = useState<number>(
+    Math.floor(Math.random() * 14) + 2,
+  ); // Default value
   useFocusEffect(
     useCallback(() => {
       const fetchDigit = async () => {
@@ -17,7 +19,7 @@ export default function TimesTable() {
       fetchDigit();
 
       const interval = setInterval(() => {
-        const randomNumber = Math.floor(Math.random() * 15) + 2;
+        const randomNumber = Math.floor(Math.random() * 14) + 2;
         setDigit(randomNumber);
       }, 15000);
 
@@ -28,8 +30,15 @@ export default function TimesTable() {
     }, []), // Empty dependency array ensures this runs on focus
   );
   return (
-    <View style={{ alignItems: "center" }}>
-      <Text style={{ fontSize: 44, fontWeight: "bold" }}>Times Table</Text>
+    <View
+      style={{
+        flex: 1,
+        // justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20,
+      }}
+    >
+      {/* <Text style={{ fontSize: 44, fontWeight: "bold" }}>Times Table</Text> */}
       {[...Array(10)].map((_, i) => (
         <View
           key={i + 1}

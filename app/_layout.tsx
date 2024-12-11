@@ -29,7 +29,7 @@ export default function Layout() {
         <Drawer.Screen
           name="multidigit"
           options={{
-            drawerLabel: "Multi Digit",
+            drawerLabel: "Multi Digit Multiplication",
             title: "Multi Digit Multiplication",
           }}
         />

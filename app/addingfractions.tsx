@@ -59,10 +59,11 @@ export default function AddingFractions() {
           flexDirection: "row",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 32 }}>= </Text>
+        <Text style={{ fontSize: 24, marginTop: 42 }}>= </Text>
         <View>
           <View>
             <TextInput
+              style={{ fontSize: 24 }}
               placeholder={"Enter Numerator"}
               value={numerator}
               onChangeText={(txt) => {
@@ -83,6 +84,7 @@ export default function AddingFractions() {
           </View>
           <FractionLine />
           <TextInput
+            style={{ fontSize: 24 }}
             placeholder={"Enter Denominator"}
             value={denominator}
             onChangeText={(txt) => {
@@ -102,7 +104,7 @@ const FractionLine = () => {
   return (
     <View>
       <Svg height="10" width="200">
-        <Line x1="0" y1="10" x2="200" y2="10" stroke="blue" strokeWidth="2" />
+        <Line x1="0" y1="10" x2="200" y2="10" stroke="black" strokeWidth="2" />
       </Svg>
     </View>
   );

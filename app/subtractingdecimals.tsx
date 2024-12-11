@@ -41,7 +41,7 @@ export default function SubtractingDecimals() {
           flexDirection: "row",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 20 }}>= </Text>
+        <Text style={{ fontSize: 24, marginTop: 10 }}>= </Text>
         <TextInput
           style={{ fontSize: 24 }}
           placeholder={"Enter Answer"}

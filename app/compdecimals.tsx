@@ -71,7 +71,7 @@ export default function ComparingDecimals() {
               setSecondNumber(b);
               setUserAnswer("");
               setResult("");
-              setSelectedOption("");
+              setSelectedOption("a");
             }}
             title="Reset"
             color="#841584"

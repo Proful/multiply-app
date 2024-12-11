@@ -41,7 +41,7 @@ export default function AddingDecimals() {
           flexDirection: "row",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 20 }}>= </Text>
+        <Text style={{ fontSize: 24, marginTop: 10 }}>= </Text>
         <TextInput
           style={{ fontSize: 24 }}
           placeholder={"Enter Answer"}
@@ -50,7 +50,10 @@ export default function AddingDecimals() {
             setUserAnswer(txt);
 
             if (txt) {
-              if (Number(txt) === firstNumber + secondNumber) {
+              const isAlmostEqual =
+                Math.abs(firstNumber + secondNumber - Number(txt)) <
+                Number.EPSILON;
+              if (isAlmostEqual) {
                 setResult("correct");
               } else {
                 setResult("wrong");
