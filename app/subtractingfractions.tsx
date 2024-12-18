@@ -6,8 +6,9 @@ import Svg, { Line } from "react-native-svg";
 import { getRandomNumberFrom, getRandomNumberTill, lcm } from "@/lib/utils";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
+import ConfettiCannon from "react-native-confetti-cannon";
 
-export default function AddingFractions() {
+export default function SubtractingFractions() {
   const [firstNumber, setFirstNumber] = useState<number[]>([0, 0]);
   const [secondNumber, setSecondNumber] = useState<number[]>([0, 0]);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -22,8 +23,15 @@ export default function AddingFractions() {
     const a1 = getRandomNumberTill(a);
     const b = getRandomNumberFrom(5);
     const b1 = getRandomNumberTill(b);
-    setFirstNumber([a1, a]);
-    setSecondNumber([b1, b]);
+
+    if (a1 / a > b1 / b) {
+      setFirstNumber([a1, a]);
+      setSecondNumber([b1, b]);
+    } else {
+      setFirstNumber([b1, b]);
+      setSecondNumber([a1, a]);
+    }
+
     setUserAnswer("");
     setResult("");
     setIsCommonDenominator(false);
@@ -50,7 +58,7 @@ export default function AddingFractions() {
       >
         <Fraction numerator={firstNumber[0]} denominator={firstNumber[1]} />
         <View>
-          <Text style={{ fontSize: 24, margin: 10 }}>+</Text>
+          <Text style={{ fontSize: 24, margin: 26 }}>-</Text>
         </View>
         <Fraction numerator={secondNumber[0]} denominator={secondNumber[1]} />
       </View>
@@ -72,7 +80,7 @@ export default function AddingFractions() {
 
                 if (txt && Number(denominator) !== 0) {
                   const ans =
-                    firstNumber[0] / firstNumber[1] +
+                    firstNumber[0] / firstNumber[1] -
                     secondNumber[0] / secondNumber[1];
                   console.log("ans", ans);
                   if (
@@ -98,7 +106,7 @@ export default function AddingFractions() {
               setDenominator(txt);
               if (txt) {
                 const ans =
-                  firstNumber[0] / firstNumber[1] +
+                  firstNumber[0] / firstNumber[1] -
                   secondNumber[0] / secondNumber[1];
                 console.log("ans2", ans);
                 if (Number(txt) / Number(denominator) - ans < Number.EPSILON) {
@@ -118,6 +126,15 @@ export default function AddingFractions() {
           />
         </View>
       </View>
+      {result === "correct" && (
+        <ConfettiCannon
+          count={200} // Number of particles
+          origin={{ x: 200, y: 0 }} // Origin of the confetti (top-center)
+          autoStart={true} // Automatically trigger confetti
+          fadeOut={true} // Confetti fades out
+          explosionSpeed={350} // Speed of the particles
+        />
+      )}
       <View style={{ alignSelf: "flex-start" }}>
         <Text>
           Is common denominator?: {isCommonDenominator ? "Yes" : "No"}

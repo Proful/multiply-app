@@ -1,6 +1,65 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
-
+import { Stack } from "expo-router/stack";
+export default function Layout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+        contentStyle: {
+          backgroundColor: "#bec3c8",
+        },
+      }}
+    >
+      <Stack.Screen name="index" options={{ title: "Math App" }} />
+      <Stack.Screen name="timestable" options={{ title: "Times Table" }} />
+      <Stack.Screen
+        name="practice"
+        options={{ title: "Multiplication Practice" }}
+      />
+      <Stack.Screen
+        name="multidigit"
+        options={{ title: "Multi Digit Multiplication" }}
+      />
+      <Stack.Screen
+        name="compdecimals"
+        options={{ title: "Comparing Decimals" }}
+      />
+      <Stack.Screen
+        name="commonfractions"
+        options={{ title: "Fraction To Decimal" }}
+      />
+      <Stack.Screen
+        name="commondecimaltofractions"
+        options={{ title: "Decimal To Fraction" }}
+      />
+      <Stack.Screen
+        name="addingdecimals"
+        options={{ title: "Adding Decimals" }}
+      />
+      <Stack.Screen
+        name="subtractingdecimals"
+        options={{ title: "Subtracting Decimals" }}
+      />
+      <Stack.Screen
+        name="addingfractions"
+        options={{ title: "Adding Fractions" }}
+      />
+      <Stack.Screen
+        name="subtractingfractions"
+        options={{ title: "Subtracting Fractions" }}
+      />
+      <Stack.Screen
+        name="threefractions"
+        options={{ title: "Three Fractions" }}
+      />
+      <Stack.Screen name="lcm" options={{ title: "LCM" }} />
+    </Stack>
+  );
+}
+/*
 export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -22,8 +81,8 @@ export default function Layout() {
         <Drawer.Screen
           name="practice"
           options={{
-            drawerLabel: "Practice",
-            title: "Practice",
+            drawerLabel: "Multiplication Practice",
+            title: "Multiplication Practice",
           }}
         />
         <Drawer.Screen
@@ -33,13 +92,6 @@ export default function Layout() {
             title: "Multi Digit Multiplication",
           }}
         />
-        {/* <Drawer.Screen */}
-        {/*   name="numberline" */}
-        {/*   options={{ */}
-        {/*     drawerLabel: "NumberLine", */}
-        {/*     title: "NumberLine", */}
-        {/*   }} */}
-        {/* /> */}
         <Drawer.Screen
           name="compdecimals"
           options={{
@@ -83,6 +135,27 @@ export default function Layout() {
           }}
         />
         <Drawer.Screen
+          name="subtractingfractions"
+          options={{
+            drawerLabel: "Subtracting Fractions",
+            title: "Subtracting Fractions",
+          }}
+        />
+        <Drawer.Screen
+          name="threefractions"
+          options={{
+            drawerLabel: "Three Fractions",
+            title: "Three Fractions",
+          }}
+        />
+        <Drawer.Screen
+          name="lcm"
+          options={{
+            drawerLabel: "LCM",
+            title: "LCM",
+          }}
+        />
+        <Drawer.Screen
           name="settings"
           options={{
             drawerLabel: "Settings",
@@ -93,3 +166,4 @@ export default function Layout() {
     </GestureHandlerRootView>
   );
 }
+*/

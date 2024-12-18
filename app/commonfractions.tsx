@@ -1,7 +1,10 @@
-import { Button, Text, View, TextInput } from "react-native";
+import { Button, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useEffect, useCallback } from "react";
 import Fraction from "@/components/Fraction";
+import { sharedStyles } from "@/lib/styles";
+import { Ionicons } from "@expo/vector-icons";
+import ConfettiCannon from "react-native-confetti-cannon";
 
 export default function CommonFractions() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
@@ -43,12 +46,21 @@ export default function CommonFractions() {
     }, []), // Empty dependency array ensures this runs on focus
   );
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-      }}
-    >
+    <View style={sharedStyles.screenContainer}>
+      <TouchableOpacity
+        style={sharedStyles.resetButton}
+        onPress={() => {
+          const a = getRandomNumber();
+          const b = Math.floor(Math.random() * a);
+          const c = b === 0 ? 1 : b;
+          setFirstNumber(c);
+          setSecondNumber(a);
+          setUserAnswer("");
+          setResult("");
+        }}
+      >
+        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+      </TouchableOpacity>
       <Fraction numerator={firstNumber} denominator={secondNumber} />
       <View
         style={{
@@ -72,22 +84,17 @@ export default function CommonFractions() {
           }}
         />
       </View>
+      {result === "correct" && (
+        <ConfettiCannon
+          count={200} // Number of particles
+          origin={{ x: 200, y: 0 }} // Origin of the confetti (top-center)
+          autoStart={true} // Automatically trigger confetti
+          fadeOut={true} // Confetti fades out
+          explosionSpeed={350} // Speed of the particles
+        />
+      )}
       <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
         <Text>Result: {result}</Text>
-        <Button
-          onPress={() => {
-            const a = getRandomNumber();
-            const b = Math.floor(Math.random() * a);
-            const c = b === 0 ? 1 : b;
-            setFirstNumber(c);
-            setSecondNumber(a);
-            setUserAnswer("");
-            setResult("");
-          }}
-          title="Reset"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
       </View>
     </View>
   );

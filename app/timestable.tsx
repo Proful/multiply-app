@@ -1,8 +1,10 @@
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect, useCallback } from "react";
 
 import { useFocusEffect } from "@react-navigation/native";
+import { sharedStyles } from "@/lib/styles";
+import { Ionicons } from "@expo/vector-icons";
 export default function TimesTable() {
   const [digit, setDigit] = useState<number>(
     Math.floor(Math.random() * 14) + 2,
@@ -30,14 +32,13 @@ export default function TimesTable() {
     }, []), // Empty dependency array ensures this runs on focus
   );
   return (
-    <View
-      style={{
-        flex: 1,
-        // justifyContent: "center",
-        alignItems: "center",
-        marginTop: 20,
-      }}
-    >
+    <View style={sharedStyles.screenContainer}>
+      <TouchableOpacity
+        style={sharedStyles.resetButton}
+        onPress={() => setDigit(Math.floor(Math.random() * 14) + 2)}
+      >
+        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+      </TouchableOpacity>
       {/* <Text style={{ fontSize: 44, fontWeight: "bold" }}>Times Table</Text> */}
       {[...Array(10)].map((_, i) => (
         <View

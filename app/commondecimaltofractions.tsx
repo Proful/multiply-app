@@ -1,7 +1,9 @@
-import { Text, View, TextInput, Button } from "react-native";
+import { Text, View, TextInput, Button, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Svg, { Line } from "react-native-svg";
+import { sharedStyles } from "@/lib/styles";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CommonDecimalToFractions() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
@@ -29,12 +31,20 @@ export default function CommonDecimalToFractions() {
   );
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-      }}
-    >
+    <View style={sharedStyles.screenContainer}>
+      <TouchableOpacity
+        style={sharedStyles.resetButton}
+        onPress={() => {
+          const a = getRandomNumber();
+          setFirstNumber(Number("0." + a));
+          setSecondNumber(a);
+          setNumerator("");
+          setDenominator("");
+          setResult("");
+        }}
+      >
+        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+      </TouchableOpacity>
       <Text style={{ fontSize: 44 }}>{firstNumber}</Text>
       <View
         style={{
@@ -90,19 +100,6 @@ export default function CommonDecimalToFractions() {
       </View>
       <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
         <Text>Result: {result}</Text>
-        <Button
-          onPress={() => {
-            const a = getRandomNumber();
-            setFirstNumber(Number("0." + a));
-            setSecondNumber(a);
-            setNumerator("");
-            setDenominator("");
-            setResult("");
-          }}
-          title="Reset"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
       </View>
     </View>
   );
