@@ -6,7 +6,7 @@ import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 
-export default function CommonFractions() {
+export default function FractionToDecimal() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -32,35 +32,33 @@ export default function CommonFractions() {
     const randomIndex = Math.floor(Math.random() * options.length);
     return options[randomIndex];
   }
-  useFocusEffect(
-    useCallback(() => {
-      const a = getRandomNumber();
-      const b = Math.floor(Math.random() * a);
-      const c = b === 0 ? 1 : b;
-      setFirstNumber(c);
-      setSecondNumber(a);
-      setUserAnswer("");
-      setResult("");
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
-    }, []), // Empty dependency array ensures this runs on focus
-  );
+  const setup = () => {
+    const a = getRandomNumber();
+    const b = Math.floor(Math.random() * a);
+    const c = b === 0 ? 1 : b;
+    setFirstNumber(c);
+    setSecondNumber(a);
+    setUserAnswer("");
+    setResult("");
+  };
+
+  useFocusEffect(useCallback(setup, []));
+
   return (
     <View style={sharedStyles.screenContainer}>
-      <TouchableOpacity
-        style={sharedStyles.resetButton}
-        onPress={() => {
-          const a = getRandomNumber();
-          const b = Math.floor(Math.random() * a);
-          const c = b === 0 ? 1 : b;
-          setFirstNumber(c);
-          setSecondNumber(a);
-          setUserAnswer("");
-          setResult("");
-        }}
-      >
+      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
+      {result === "correct" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+        </View>
+      )}
+      {result === "wrong" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="close-circle-outline" size={50} color="red" />
+        </View>
+      )}
       <Fraction numerator={firstNumber} denominator={secondNumber} />
       <View
         style={{
@@ -93,9 +91,6 @@ export default function CommonFractions() {
           explosionSpeed={350} // Speed of the particles
         />
       )}
-      <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
-        <Text>Result: {result}</Text>
-      </View>
     </View>
   );
 }

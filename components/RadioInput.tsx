@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 interface RadioInputProps {
@@ -18,6 +18,10 @@ const RadioInput: React.FC<RadioInputProps> = ({
     setSelectedValue(option);
     onValueChange(option);
   };
+
+  useEffect(() => {
+    setSelectedValue(value);
+  }, [value]);
 
   return (
     <View style={styles.container}>
@@ -64,7 +68,7 @@ const styles = StyleSheet.create({
     borderColor: "#007AFF",
   },
   radioButtonLabel: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#333",
   },
 });

@@ -27,21 +27,17 @@ const MultiplicationChecker = () => {
     return Math.floor(Math.random() * 90) + 10;
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setFirstNumber(generateTwoDigitNumber());
-      setSecondNumber(generateTwoDigitNumber());
-      setUserAnswer("");
-      setResult("");
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
-    }, []), // Empty dependency array ensures this runs on focus
-  );
-  // Initialize numbers on component mount
-  // useEffect(() => {
-  //   setFirstNumber(generateTwoDigitNumber());
-  //   setSecondNumber(generateTwoDigitNumber());
-  // }, []);
+  const setup = () => {
+    setFirstNumber(generateTwoDigitNumber());
+    setSecondNumber(generateTwoDigitNumber());
+    setUserAnswer("");
+    setResult("");
+    setCarry("");
+    setStep1("");
+    setStep2("");
+  };
+
+  useFocusEffect(useCallback(setup, []));
 
   // Check user's answer
   const checkAnswer = (input: string) => {
@@ -65,20 +61,19 @@ const MultiplicationChecker = () => {
 
   return (
     <>
-      <TouchableOpacity
-        style={sharedStyles.resetButton}
-        onPress={() => {
-          setFirstNumber(generateTwoDigitNumber());
-          setSecondNumber(generateTwoDigitNumber());
-          setCarry("");
-          setStep1("");
-          setStep2("");
-          setUserAnswer("");
-          setResult("");
-        }}
-      >
+      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
+      {result === "correct" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+        </View>
+      )}
+      {result === "wrong" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="close-circle-outline" size={50} color="red" />
+        </View>
+      )}
       <View style={{ alignItems: "center" }}>
         <Text style={{ fontSize: 44 }}>{"    " + firstNumber}</Text>
 
@@ -181,9 +176,6 @@ const MultiplicationChecker = () => {
             explosionSpeed={350} // Speed of the particles
           />
         )}
-        <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
-          <Text>Result: {result}</Text>
-        </View>
       </View>
     </>
   );

@@ -1,7 +1,14 @@
-export function getRandomNumber() {
-  const options = [2, 3, 5];
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
+export function getRandomNumber(
+  min: number | undefined,
+  max: number | undefined,
+) {
+  if (min === undefined) {
+    const options = [2, 3, 5];
+    const randomIndex = Math.floor(Math.random() * options.length);
+    return options[randomIndex];
+  } else {
+    return Math.floor(Math.random() * (max! - min + 1)) + min;
+  }
 }
 export function getRandomMultiple(w: number) {
   // Generate all multiples of w in the range 1 to 50
@@ -18,6 +25,9 @@ export function getRandomMultiple(w: number) {
   // Select a random multiple
   const randomIndex = Math.floor(Math.random() * multiples.length);
   return multiples[randomIndex];
+}
+export function leftPad(num: number, targetLength: number): string {
+  return num.toString().padStart(targetLength, "0");
 }
 export function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);

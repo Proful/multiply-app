@@ -1,4 +1,3 @@
-import { Link } from "expo-router";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 
@@ -11,7 +10,7 @@ export default function Index() {
             onPress={() => router.push("/timestable")}
             style={styles.press}
           >
-            <Text>Times Table</Text>
+            <Text style={styles.text}>Times Table</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
@@ -19,15 +18,15 @@ export default function Index() {
             onPress={() => router.push("/practice")}
             style={styles.press}
           >
-            <Text>Practice</Text>
+            <Text style={styles.text}>Times Table Practice</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/multidigit")}
+            onPress={() => router.push("/multiplication")}
             style={styles.press}
           >
-            <Text>Multiplication</Text>
+            <Text style={styles.text}>Multiplication</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -35,26 +34,26 @@ export default function Index() {
       <View style={styles.row}>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/compdecimals")}
+            onPress={() => router.push("/comparingdecimals")}
             style={styles.press}
           >
-            <Text>Comparing Decimals</Text>
+            <Text style={styles.text}>Comparing Decimals</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/commonfractions")}
+            onPress={() => router.push("/fractiontodecimal")}
             style={styles.press}
           >
-            <Text>Fractions To Decimal</Text>
+            <Text style={styles.text}>Fraction To Decimal</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/commondecimaltofractions")}
+            onPress={() => router.push("/decimaltofraction")}
             style={styles.press}
           >
-            <Text>Decimal To Fractions</Text>
+            <Text style={styles.text}>Decimal To Fraction</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -64,7 +63,7 @@ export default function Index() {
             onPress={() => router.push("/addingdecimals")}
             style={styles.press}
           >
-            <Text>Adding Decimals</Text>
+            <Text style={styles.text}>Adding Decimals</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
@@ -72,7 +71,7 @@ export default function Index() {
             onPress={() => router.push("/subtractingdecimals")}
             style={styles.press}
           >
-            <Text>Subtracting Decimals</Text>
+            <Text style={styles.text}>Subtracting Decimals</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
@@ -80,7 +79,7 @@ export default function Index() {
             onPress={() => router.push("/addingfractions")}
             style={styles.press}
           >
-            <Text>Adding Fractions</Text>
+            <Text style={styles.text}>Adding Fractions</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -90,7 +89,7 @@ export default function Index() {
             onPress={() => router.push("/subtractingfractions")}
             style={styles.press}
           >
-            <Text>Subtracting Fractions</Text>
+            <Text style={styles.text}>Subtracting Fractions</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
@@ -98,7 +97,7 @@ export default function Index() {
             onPress={() => router.push("/threefractions")}
             style={styles.press}
           >
-            <Text>Three Fractions</Text>
+            <Text style={styles.text}>Three Fractions</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.column}>
@@ -106,7 +105,7 @@ export default function Index() {
             onPress={() => router.push("/lcm")}
             style={styles.press}
           >
-            <Text>LCM</Text>
+            <Text style={styles.text}>LCM</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -141,7 +140,6 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center text horizontally
   },
   text: {
-    color: "#fff",
-    fontWeight: "bold",
+    textAlign: "center",
   },
 });

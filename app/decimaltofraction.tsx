@@ -5,7 +5,7 @@ import Svg, { Line } from "react-native-svg";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function CommonDecimalToFractions() {
+export default function DecimalToFraction() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [numerator, setNumerator] = useState<string>("");
@@ -45,6 +45,16 @@ export default function CommonDecimalToFractions() {
       >
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
+      {result === "correct" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+        </View>
+      )}
+      {result === "wrong" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="close-circle-outline" size={50} color="red" />
+        </View>
+      )}
       <Text style={{ fontSize: 44 }}>{firstNumber}</Text>
       <View
         style={{
@@ -97,9 +107,6 @@ export default function CommonDecimalToFractions() {
             }}
           />
         </View>
-      </View>
-      <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
-        <Text>Result: {result}</Text>
       </View>
     </View>
   );

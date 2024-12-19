@@ -14,25 +14,21 @@ export default function SubtractingDecimals() {
   function getRandomNumber() {
     const randomNum = Math.floor(Math.random() * 9) + 1;
     return randomNum;
-    // const options = [2, 4, 5, 10];
-    // const randomIndex = Math.floor(Math.random() * 10)+1;
-    // return options[randomIndex];
   }
-  useFocusEffect(
-    useCallback(() => {
-      const a = getRandomNumber();
-      const b = getRandomNumber();
-      const c = Number("0." + (a > b ? a : b));
-      const d = Number("0." + (a > b ? b : a));
-      console.log(c, d);
-      setFirstNumber(c);
-      setSecondNumber(d);
-      setUserAnswer("");
-      setResult("");
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
-    }, []), // Empty dependency array ensures this runs on focus
-  );
+
+  const setup = () => {
+    const a = getRandomNumber();
+    const b = getRandomNumber();
+    const c = Number("0." + (a > b ? a : b));
+    const d = Number("0." + (a > b ? b : a));
+    console.log(c, d);
+    setFirstNumber(c);
+    setSecondNumber(d);
+    setUserAnswer("");
+    setResult("");
+  };
+
+  useFocusEffect(useCallback(setup, []));
 
   return (
     <View style={sharedStyles.screenContainer}>
@@ -51,6 +47,16 @@ export default function SubtractingDecimals() {
       >
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
+      {result === "correct" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+        </View>
+      )}
+      {result === "wrong" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="close-circle-outline" size={50} color="red" />
+        </View>
+      )}
       <Text style={{ fontSize: 44 }}>
         {firstNumber} - {secondNumber}
       </Text>
@@ -86,9 +92,6 @@ export default function SubtractingDecimals() {
           explosionSpeed={350} // Speed of the particles
         />
       )}
-      <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
-        <Text>Result: {result}</Text>
-      </View>
     </View>
   );
 }

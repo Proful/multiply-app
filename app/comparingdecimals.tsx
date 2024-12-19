@@ -5,6 +5,7 @@ import RadioInput from "@/components/RadioInput";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { getRandomNumber, leftPad } from "@/lib/utils";
 
 export default function ComparingDecimals() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
@@ -23,42 +24,36 @@ export default function ComparingDecimals() {
       setResult(firstNumber === secondNumber ? "correct" : "wrong");
     }
   };
-  // Generate random 2 digit number (10-99)
-  const generateTwoDigitNumber = (): number => {
-    return Math.floor(Math.random() * 90) + 10;
+
+  const setup = () => {
+    const tmp = getRandomNumber(1, 99);
+    const a = Number(tmp + "." + leftPad(getRandomNumber(1, 999), 3));
+    const b = Number(tmp + "." + leftPad(getRandomNumber(1, 999), 3));
+    setFirstNumber(a);
+    setSecondNumber(b);
+    setUserAnswer("");
+    setResult("");
+    setSelectedOption("");
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const tmp = generateTwoDigitNumber();
-      const a = Number(tmp + "." + generateTwoDigitNumber());
-      const b = Number(tmp + "." + generateTwoDigitNumber());
-      setFirstNumber(a);
-      setSecondNumber(b);
-      setUserAnswer("");
-      setResult("");
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
-    }, []), // Empty dependency array ensures this runs on focus
-  );
+  useFocusEffect(useCallback(setup, []));
+
   return (
     <>
       <View style={sharedStyles.screenContainer}>
-        <TouchableOpacity
-          style={sharedStyles.resetButton}
-          onPress={() => {
-            const tmp = generateTwoDigitNumber();
-            const a = Number(tmp + "." + generateTwoDigitNumber());
-            const b = Number(tmp + "." + generateTwoDigitNumber());
-            setFirstNumber(a);
-            setSecondNumber(b);
-            setUserAnswer("");
-            setResult("");
-            setSelectedOption("a");
-          }}
-        >
+        <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
           <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
         </TouchableOpacity>
+        {result === "correct" && (
+          <View style={sharedStyles.resultButton}>
+            <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+          </View>
+        )}
+        {result === "wrong" && (
+          <View style={sharedStyles.resultButton}>
+            <Ionicons name="close-circle-outline" size={50} color="red" />
+          </View>
+        )}
         <View
           style={{
             flexDirection: "row",
@@ -82,9 +77,6 @@ export default function ComparingDecimals() {
             explosionSpeed={350} // Speed of the particles
           />
         )}
-        <View style={{ alignSelf: "flex-start", marginTop: 24 }}>
-          <Text>Result: {result}</Text>
-        </View>
       </View>
     </>
   );

@@ -17,6 +17,7 @@ export default function AddingFractions() {
 
   const [numerator, setNumerator] = useState<string>("");
   const [denominator, setDenominator] = useState<string>("");
+
   function setup() {
     const a = getRandomNumberFrom(4);
     const a1 = getRandomNumberTill(a);
@@ -30,19 +31,24 @@ export default function AddingFractions() {
     setNumerator("");
     setDenominator("");
   }
-  useFocusEffect(
-    useCallback(() => {
-      setup();
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
-    }, []), // Empty dependency array ensures this runs on focus
-  );
+
+  useFocusEffect(useCallback(setup, []));
 
   return (
     <View style={sharedStyles.screenContainer}>
       <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
+      {result === "correct" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+        </View>
+      )}
+      {result === "wrong" && (
+        <View style={sharedStyles.resultButton}>
+          <Ionicons name="close-circle-outline" size={50} color="red" />
+        </View>
+      )}
       <View
         style={{
           flexDirection: "row",
@@ -122,7 +128,6 @@ export default function AddingFractions() {
         <Text>
           Is common denominator?: {isCommonDenominator ? "Yes" : "No"}
         </Text>
-        <Text>Result: {result}</Text>
       </View>
     </View>
   );

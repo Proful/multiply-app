@@ -20,19 +20,19 @@ export default function Layout() {
         options={{ title: "Multiplication Practice" }}
       />
       <Stack.Screen
-        name="multidigit"
-        options={{ title: "Multi Digit Multiplication" }}
+        name="multiplication"
+        options={{ title: "Multiplication" }}
       />
       <Stack.Screen
-        name="compdecimals"
+        name="comparingdecimals"
         options={{ title: "Comparing Decimals" }}
       />
       <Stack.Screen
-        name="commonfractions"
+        name="fractiontodecimal"
         options={{ title: "Fraction To Decimal" }}
       />
       <Stack.Screen
-        name="commondecimaltofractions"
+        name="decimaltofraction"
         options={{ title: "Decimal To Fraction" }}
       />
       <Stack.Screen
