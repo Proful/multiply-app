@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { compareFloatWithDifference } from "@/lib/utils";
 
 export default function SubtractingDecimals() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
@@ -21,7 +22,6 @@ export default function SubtractingDecimals() {
     const b = getRandomNumber();
     const c = Number("0." + (a > b ? a : b));
     const d = Number("0." + (a > b ? b : a));
-    console.log(c, d);
     setFirstNumber(c);
     setSecondNumber(d);
     setUserAnswer("");
@@ -32,19 +32,7 @@ export default function SubtractingDecimals() {
 
   return (
     <View style={sharedStyles.screenContainer}>
-      <TouchableOpacity
-        style={sharedStyles.resetButton}
-        onPress={() => {
-          const a = getRandomNumber();
-          const b = getRandomNumber();
-          const c = Number("0." + (a > b ? a : b));
-          const d = Number("0." + (a > b ? b : a));
-          setFirstNumber(c);
-          setSecondNumber(d);
-          setUserAnswer("");
-          setResult("");
-        }}
-      >
+      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
       {result === "correct" && (
@@ -67,14 +55,20 @@ export default function SubtractingDecimals() {
       >
         <Text style={{ fontSize: 24, marginTop: 10 }}>= </Text>
         <TextInput
-          style={{ fontSize: 24 }}
+          style={{ fontSize: 24, width: "75%" }}
           placeholder={"Enter Answer"}
           value={userAnswer}
           onChangeText={(txt) => {
             setUserAnswer(txt);
 
             if (txt) {
-              if (Number(txt) === firstNumber - secondNumber) {
+              if (
+                compareFloatWithDifference(
+                  Number(txt),
+                  firstNumber,
+                  secondNumber,
+                )
+              ) {
                 setResult("correct");
               } else {
                 setResult("wrong");

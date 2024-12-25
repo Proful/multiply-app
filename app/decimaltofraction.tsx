@@ -17,32 +17,21 @@ export default function DecimalToFraction() {
     const randomIndex = Math.floor(Math.random() * options.length);
     return options[randomIndex];
   }
-  useFocusEffect(
-    useCallback(() => {
-      const a = getRandomNumber();
-      setFirstNumber(Number("0." + a));
-      setSecondNumber(a);
-      setNumerator("");
-      setDenominator("");
-      setResult("");
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {};
-    }, []), // Empty dependency array ensures this runs on focus
-  );
+
+  const setup = () => {
+    const a = getRandomNumber();
+    setFirstNumber(Number("0." + a));
+    setSecondNumber(a);
+    setNumerator("");
+    setDenominator("");
+    setResult("");
+  };
+
+  useFocusEffect(useCallback(setup, []));
 
   return (
     <View style={sharedStyles.screenContainer}>
-      <TouchableOpacity
-        style={sharedStyles.resetButton}
-        onPress={() => {
-          const a = getRandomNumber();
-          setFirstNumber(Number("0." + a));
-          setSecondNumber(a);
-          setNumerator("");
-          setDenominator("");
-          setResult("");
-        }}
-      >
+      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
       {result === "correct" && (

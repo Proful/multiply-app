@@ -1,6 +1,10 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { Stack } from "expo-router/stack";
+import { router } from "expo-router";
+import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
 export default function Layout() {
   return (
     <Stack
@@ -13,15 +17,55 @@ export default function Layout() {
         },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Math App" }} />
-      <Stack.Screen name="timestable" options={{ title: "Times Table" }} />
+      <Stack.Screen name="index" options={{ title: "Mathlet" }} />
       <Stack.Screen
-        name="practice"
-        options={{ title: "Multiplication Practice" }}
+        name="timestable"
+        options={{
+          title: "Times Table",
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push("/timestable_settings")}
+              style={{
+                marginRight: 10,
+                zIndex: 9,
+              }}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            >
+              <Ionicons name="settings-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="timestable_settings"
+        options={{ title: "Settings Times Table" }}
+      />
+      <Stack.Screen
+        name="timestablepractice"
+        options={{ title: "Timestable Practice" }}
       />
       <Stack.Screen
         name="multiplication"
-        options={{ title: "Multiplication" }}
+        options={{
+          title: "Multiplication",
+
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push("/multiplication_settings")}
+              style={{
+                marginRight: 10,
+                zIndex: 9,
+              }}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            >
+              <Ionicons name="settings-outline" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="multiplication_settings"
+        options={{ title: "Settings Multiplication" }}
       />
       <Stack.Screen
         name="comparingdecimals"
@@ -56,6 +100,15 @@ export default function Layout() {
         options={{ title: "Three Fractions" }}
       />
       <Stack.Screen name="lcm" options={{ title: "LCM" }} />
+      <Stack.Screen
+        name="addingmixed"
+        options={{ title: "Adding Mixed Fractions" }}
+      />
+      <Stack.Screen
+        name="subtractingmixed"
+        options={{ title: "Subtracting Mixed Fractions" }}
+      />
+      <Stack.Screen name="division" options={{ title: "Division" }} />
     </Stack>
   );
 }

@@ -1,5 +1,8 @@
+import { sharedStyles } from "@/lib/styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
+
 export function Question({ value }: { value: string }) {
   return <Text style={{ fontSize: 36 }}>{value}</Text>;
 }
@@ -50,51 +53,63 @@ export type OptionsData = {
 
 const INTERVAL_TIME = 4000; //display Question
 const TIMEOUT_TIME = 2000; //display answer
+const STORAGE_KEY = "timestable";
+const FROM_VALUE = 2;
+const TO_VALUE = 10;
 
-const multiply = function* (): Generator<JSX.Element, void, unknown> {
-  // Chose random number from 2 to 9 for numerator & denominator
-  const a = random(2, 15);
+const multiply = async function* (): AsyncGenerator<
+  JSX.Element,
+  void,
+  unknown
+> {
+  // const loadStoredData = async () => {
+  let fromValue = FROM_VALUE,
+    toValue = TO_VALUE;
+  try {
+    const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
+    if (storedValue) {
+      const { from, to } = JSON.parse(storedValue);
+      fromValue = Number(from);
+      toValue = Number(to);
+    }
+  } catch (error) {
+    console.error("Failed to load data from AsyncStorage:", error);
+  }
+  // };
+
+  // loadStoredData();
+
+  const a = random(fromValue, toValue);
   const b = random(2, 9);
 
   yield <Question value={`${a} X ${b} = ?`} />;
   yield <Answer value={`${a} X ${b} = ${a * b}`} />;
 };
 
-const divide = function* () {
-  const a = random(2, 9);
-  const b = random(2, 9);
-  const c = a * b;
-
-  yield <Question value={`${c} ÷ ${b} = ?`} />;
-  yield <Answer value={`${c} ÷ ${b} = ${a}`} />;
-};
-
-export const PracticeFast = () => {
+export default function TimestablePractice() {
   const [content, setContent] = useState(<></>);
-  const optionsData = {
-    feature: Features.PracticeFast,
-    featureSubtype: FeaturesSubtype.Multiply,
-  };
-  const logic = (op: () => Generator<JSX.Element, void, unknown>) => {
+  const logic = async (
+    op: () => AsyncGenerator<JSX.Element, void, unknown>,
+  ) => {
     const mul = op();
-    setContent(mul.next().value!); //! I know for sure that the Generator will return data
+    setContent((await mul.next()).value!); //! I know for sure that the Generator will return data
 
-    setTimeout(() => {
-      setContent(mul.next().value!);
+    setTimeout(async () => {
+      setContent((await mul.next()).value!);
     }, TIMEOUT_TIME);
   };
 
   useEffect(() => {
     let intervalId: unknown;
-    let op: unknown;
+    let op = multiply;
 
-    if (optionsData.featureSubtype === FeaturesSubtype.Multiply) op = multiply;
-    else if (optionsData.featureSubtype === FeaturesSubtype.Divide) op = divide;
-    else op = multiply;
+    // if (optionsData.featureSubtype === FeaturesSubtype.Multiply) op = multiply;
+    // else if (optionsData.featureSubtype === FeaturesSubtype.Divide) op = divide;
+    // else op = multiply;
 
-    logic(op as () => Generator<JSX.Element, void, unknown>);
+    logic(op as () => AsyncGenerator<JSX.Element, void, unknown>);
     intervalId = setInterval(() => {
-      logic(op as () => Generator<JSX.Element, void, unknown>);
+      logic(op as () => AsyncGenerator<JSX.Element, void, unknown>);
     }, INTERVAL_TIME);
 
     return () => {
@@ -104,8 +119,8 @@ export const PracticeFast = () => {
   }, []);
 
   return (
-    <>
+    <View style={sharedStyles.screenContainer}>
       <View>{content}</View>
-    </>
+    </View>
   );
-};
+}

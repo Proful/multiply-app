@@ -54,7 +54,7 @@ export default function LCM() {
         >
           <Text style={{ fontSize: 24, marginTop: 10 }}>= </Text>
           <TextInput
-            style={{ fontSize: 24 }}
+            style={{ fontSize: 24, width: "55%" }}
             placeholder={"Enter Answer"}
             value={userAnswer}
             onChangeText={(txt) => {

@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { getRandomNumber } from "@/lib/utils";
 
 export default function AddingDecimals() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
@@ -11,15 +12,9 @@ export default function AddingDecimals() {
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [result, setResult] = useState<string>("");
 
-  function getRandomNumber() {
-    const options = [2, 4, 5, 10];
-    const randomIndex = Math.floor(Math.random() * options.length);
-    return options[randomIndex];
-  }
-
   const setup = () => {
-    const a = getRandomNumber();
-    const b = getRandomNumber();
+    const a = getRandomNumber(1, 999);
+    const b = getRandomNumber(1, 999);
     setFirstNumber(Number("0." + a));
     setSecondNumber(Number("0." + b));
     setUserAnswer("");
@@ -53,9 +48,10 @@ export default function AddingDecimals() {
       >
         <Text style={{ fontSize: 24, marginTop: 10 }}>= </Text>
         <TextInput
-          style={{ fontSize: 24 }}
+          style={{ fontSize: 24, width: "75%" }}
           placeholder={"Enter Answer"}
           value={userAnswer}
+          keyboardType="numeric"
           onChangeText={(txt) => {
             setUserAnswer(txt);
 

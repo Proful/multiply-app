@@ -7,7 +7,7 @@ export default function Index() {
       <View style={styles.row}>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/timestable")}
+            onPress={() => router.push("/division_animator")}
             style={styles.press}
           >
             <Text style={styles.text}>Times Table</Text>
@@ -15,7 +15,7 @@ export default function Index() {
         </View>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/practice")}
+            onPress={() => router.push("/timestablepractice")}
             style={styles.press}
           >
             <Text style={styles.text}>Times Table Practice</Text>
@@ -106,6 +106,32 @@ export default function Index() {
             style={styles.press}
           >
             <Text style={styles.text}>LCM</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.row}>
+        <View style={styles.column}>
+          <TouchableOpacity
+            onPress={() => router.push("/addingmixed")}
+            style={styles.press}
+          >
+            <Text style={styles.text}>Adding Mixed Fractions</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.column}>
+          <TouchableOpacity
+            onPress={() => router.push("/subtractingmixed")}
+            style={styles.press}
+          >
+            <Text style={styles.text}>Subtracting Mixed Fractions</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.column}>
+          <TouchableOpacity
+            onPress={() => router.push("/division")}
+            style={styles.press}
+          >
+            <Text style={styles.text}>Division</Text>
           </TouchableOpacity>
         </View>
       </View>

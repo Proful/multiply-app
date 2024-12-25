@@ -21,8 +21,8 @@ const Fraction: React.FC<FractionProps> = ({ numerator, denominator }) => {
 
 const LineExample = () => (
   <View>
-    <Svg height="10" width="50">
-      <Line x1="0" y1="10" x2="50" y2="10" stroke="black" strokeWidth="2" />
+    <Svg height="10" width="30">
+      <Line x1="0" y1="10" x2="30" y2="10" stroke="black" strokeWidth="2" />
     </Svg>
   </View>
 );

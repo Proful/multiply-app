@@ -88,7 +88,6 @@ export default function SubtractingFractions() {
                   const ans =
                     firstNumber[0] / firstNumber[1] -
                     secondNumber[0] / secondNumber[1];
-                  console.log("ans", ans);
                   if (
                     Number(txt) / Number(denominator) - ans <
                     Number.EPSILON
@@ -114,7 +113,6 @@ export default function SubtractingFractions() {
                 const ans =
                   firstNumber[0] / firstNumber[1] -
                   secondNumber[0] / secondNumber[1];
-                console.log("ans2", ans);
                 if (Number(txt) / Number(denominator) - ans < Number.EPSILON) {
                   setResult("correct");
                 } else {
@@ -141,10 +139,8 @@ export default function SubtractingFractions() {
           explosionSpeed={350} // Speed of the particles
         />
       )}
-      <View style={{ alignSelf: "flex-start" }}>
-        <Text>
-          Is common denominator?: {isCommonDenominator ? "Yes" : "No"}
-        </Text>
+      <View style={{ alignSelf: "flex-start", marginLeft: 20, marginTop: 20 }}>
+        <Text>Is common denominator? {isCommonDenominator ? "Yes" : "No"}</Text>
       </View>
     </View>
   );

@@ -3,7 +3,12 @@ import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Fraction from "@/components/Fraction";
 import Svg, { Line } from "react-native-svg";
-import { getRandomNumberFrom, getRandomNumberTill, lcm } from "@/lib/utils";
+import {
+  compareFloat,
+  getRandomNumberFrom,
+  getRandomNumberTill,
+  lcm,
+} from "@/lib/utils";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -80,11 +85,7 @@ export default function AddingFractions() {
                   const ans =
                     firstNumber[0] / firstNumber[1] +
                     secondNumber[0] / secondNumber[1];
-                  console.log("ans", ans);
-                  if (
-                    Number(txt) / Number(denominator) - ans <
-                    Number.EPSILON
-                  ) {
+                  if (compareFloat(Number(txt) / Number(denominator), ans)) {
                     setResult("correct");
                   } else {
                     setResult("wrong");
@@ -106,8 +107,7 @@ export default function AddingFractions() {
                 const ans =
                   firstNumber[0] / firstNumber[1] +
                   secondNumber[0] / secondNumber[1];
-                console.log("ans2", ans);
-                if (Number(txt) / Number(denominator) - ans < Number.EPSILON) {
+                if (compareFloat(Number(numerator) / Number(txt), ans)) {
                   setResult("correct");
                 } else {
                   setResult("wrong");
@@ -124,7 +124,7 @@ export default function AddingFractions() {
           />
         </View>
       </View>
-      <View style={{ alignSelf: "flex-start" }}>
+      <View style={{ alignSelf: "flex-start", marginLeft: 20, marginTop: 20 }}>
         <Text>
           Is common denominator?: {isCommonDenominator ? "Yes" : "No"}
         </Text>

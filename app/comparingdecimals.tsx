@@ -6,6 +6,7 @@ import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { getRandomNumber, leftPad } from "@/lib/utils";
+import FiveDigitInput from "@/components/FiveDigitInput";
 
 export default function ComparingDecimals() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
@@ -54,6 +55,7 @@ export default function ComparingDecimals() {
             <Ionicons name="close-circle-outline" size={50} color="red" />
           </View>
         )}
+
         <View
           style={{
             flexDirection: "row",

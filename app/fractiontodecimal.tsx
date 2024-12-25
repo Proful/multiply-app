@@ -67,7 +67,7 @@ export default function FractionToDecimal() {
       >
         <Text style={{ fontSize: 24, marginTop: 13 }}>= </Text>
         <TextInput
-          style={{ fontSize: 28 }}
+          style={{ fontSize: 28, width: "85%" }}
           placeholder={"Enter your answer"}
           value={userAnswer}
           onChangeText={(txt) => {
