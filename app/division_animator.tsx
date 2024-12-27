@@ -11,6 +11,8 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
   withDelay,
+  withSequence,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useState } from "react";
@@ -23,6 +25,8 @@ type Step = {
   position: number;
   currentValue: string;
   bringDown?: number;
+  remainderStartPosition: number;
+  subtractFromPosition: number;
 };
 
 const SPACING = 50;
@@ -35,66 +39,126 @@ const STEP_DELAY = 500;
 const ANIMATION_DURATION = 5000;
 const MAX_STEPS = 10;
 
+type LongDivisionAnimatorProps = {
+  dividend: string;
+  divisor: string;
+};
+
 const LongDivisionAnimator = () => {
-  const [dividend, setDividend] = useState("2354");
-  const [divisor, setDivisor] = useState("3");
+  // const LongDivisionAnimator = ({
+  //   dividend = "9572",
+  //   divisor = "8",
+  // }: LongDivisionAnimatorProps) => {
+  const dividend = "9572";
+  const divisor = "8";
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(-1);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Animation shared values
+  const opacities = Array(MAX_STEPS)
+    .fill(0)
+    .map(() => useSharedValue(0));
+  const derivedOpacities = opacities.map((opacity) =>
+    useDerivedValue(() => opacity.value),
+  );
 
   const font = useFont(require("../assets/BlexMonoNerdFont-Regular.ttf"), 24);
 
-  const calculateSteps = useMemo(
-    () => () => {
-      const divisorNum = parseInt(divisor);
+  const calculateSteps = useCallback(() => {
+    const divisorNum = parseInt(divisor);
+    if (!divisorNum || isNaN(divisorNum)) return;
 
-      const dividendDigits = dividend.split("").map(Number);
-      const newSteps: Step[] = [];
-      let currentNumber = "";
-      let position = 0;
-      let i = 0;
+    const dividendDigits = dividend.split("").map(Number);
+    const newSteps: Step[] = [];
+    let currentNumber = "";
+    let position = 0;
+    let i = 0;
+    let startPosition = 0;
 
-      while (i < dividendDigits.length) {
-        // Add current digit to working number
-        currentNumber += dividendDigits[i];
-        let currentNum = parseInt(currentNumber);
+    while (i < dividendDigits.length) {
+      currentNumber += dividendDigits[i];
+      let currentNum = parseInt(currentNumber);
 
-        // If number is less than divisor and we have more digits, bring down next digit
-        if (currentNum < divisorNum && i < dividendDigits.length - 1) {
-          i++;
-          continue;
-        }
-
-        const quotientDigit = Math.floor(currentNum / divisorNum);
-        const product = quotientDigit * divisorNum;
-        const remainder = currentNum - product;
-
-        newSteps.push({
-          currentDigit: quotientDigit,
-          product,
-          remainder,
-          position,
-          currentValue: currentNumber,
-          bringDown:
-            i < dividendDigits.length - 1 ? dividendDigits[i + 1] : undefined,
-        });
-
-        currentNumber = remainder.toString();
-        position++;
+      if (currentNum < divisorNum && i < dividendDigits.length - 1) {
+        startPosition++;
         i++;
+        continue;
       }
 
-      setSteps(newSteps);
-      setCurrentStep(0);
-      // startAnimation();
-    },
-    [dividend, divisor],
+      const quotientDigit = Math.floor(currentNum / divisorNum);
+      const product = quotientDigit * divisorNum;
+      const remainder = currentNum - product;
+
+      newSteps.push({
+        currentDigit: quotientDigit,
+        product,
+        remainder,
+        position,
+        currentValue: currentNumber,
+        bringDown:
+          i < dividendDigits.length - 1 ? dividendDigits[i + 1] : undefined,
+        remainderStartPosition: startPosition, // Store the position where this step's calculation started
+        subtractFromPosition:
+          currentNumber.length === 1 ? startPosition : startPosition - 1,
+      });
+
+      currentNumber = remainder.toString();
+      position++;
+      startPosition = i + 1;
+      i++;
+    }
+
+    opacities.forEach((opacity) => {
+      opacity.value = 0;
+    });
+
+    setSteps(newSteps);
+    setCurrentStep(-1);
+    setIsAnimating(false);
+  }, [dividend, divisor]);
+
+  // Initialize calculation on focus
+  useFocusEffect(
+    useCallback(() => {
+      calculateSteps();
+    }, [calculateSteps]),
   );
 
-  useFocusEffect(useCallback(calculateSteps, []));
+  useEffect(() => {
+    if (currentStep >= -1 && currentStep < steps.length - 1 && !isAnimating) {
+      nextStep();
+    }
+  }, [currentStep, isAnimating, steps]);
+
+  // Handle animation of each step
+  const animateStep = useCallback(
+    (stepIndex: number) => {
+      if (stepIndex >= MAX_STEPS) return;
+
+      setIsAnimating(true);
+
+      // Animate current step
+      opacities[stepIndex].value = withSequence(
+        withDelay(STEP_DELAY, withTiming(1, { duration: ANIMATION_DURATION })),
+        withSpring(1),
+      );
+
+      // Enable next step button after animation
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, STEP_DELAY + ANIMATION_DURATION);
+    },
+    [currentStep],
+  );
 
   const nextStep = () => {
+    if (isAnimating) return;
+
+    const nextStepIndex = currentStep + 1;
     if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentStep(nextStepIndex);
+      animateStep(nextStepIndex);
     }
   };
 
@@ -153,7 +217,6 @@ const LongDivisionAnimator = () => {
     <Group key="steps">
       {steps.map((step, stepIndex) => {
         if (stepIndex > currentStep) return null;
-
         if (stepIndex >= MAX_STEPS) return null;
 
         const xOffset = BASE_X;
@@ -161,35 +224,56 @@ const LongDivisionAnimator = () => {
           BASE_Y + stepIndex + 0.2 * STEP_HEIGHT + stepIndex * 80 + 20;
         const productStr = step.product.toString();
 
+        // Monkey fix: Alignment of product depending on currentValue
+        // whether is single digit or double digit
+        let shiftAlignmentOfProduct = false;
+        if (step.currentValue.length === 2 && productStr.length === 1) {
+          shiftAlignmentOfProduct = true;
+        }
+
+        console.log(
+          `step = ${stepIndex}, xOffset = ${xOffset}, x = ${xOffset + step.subtractFromPosition * SPACING}, sub = ${step.subtractFromPosition}, rem = ${step.remainderStartPosition}`,
+          step,
+        );
+
         return (
-          <Group key={`step-${stepIndex}`}>
-            {/* Quotient digit */}
+          <Group
+            key={`step-${stepIndex}`}
+            opacity={derivedOpacities[stepIndex]}
+          >
+            {/* Keep quotient digit and product rendering the same */}
             <SkiaText
               x={xOffset + step.position * SPACING}
-              y={BASE_Y - 60} // Moved up above the line
+              y={BASE_Y - 60}
               text={step.currentDigit.toString()}
               font={font}
             />
-
             <Group key="productStr">
               <SkiaText
-                x={xOffset - 20 + stepIndex * 20}
-                y={yOffset} // Positioned below the line
-                text={"-"}
+                x={
+                  xOffset -
+                  (shiftAlignmentOfProduct ? 0 : 20) +
+                  step.subtractFromPosition * SPACING
+                }
+                y={yOffset}
+                text="-"
                 font={font}
               />
               {productStr.split("").map((digit, index) => (
                 <SkiaText
-                  key={`dividend-${index}`}
-                  x={xOffset + index * SPACING + stepIndex * 50}
-                  y={yOffset} // Positioned below the line
+                  key={`product-${index}`}
+                  x={
+                    xOffset +
+                    (step.subtractFromPosition +
+                      (shiftAlignmentOfProduct ? index + 1 : index)) *
+                      SPACING
+                  }
+                  y={yOffset}
                   text={digit}
                   font={font}
                 />
               ))}
             </Group>
-
-            {/* Subtraction line with same width as division line */}
             <Path
               path={`M ${xOffset - 5} ${yOffset + 10} h ${LINE_WIDTH}`}
               strokeWidth={1}
@@ -197,25 +281,18 @@ const LongDivisionAnimator = () => {
               color="#000"
             />
 
-            {/* Remainder and brought down digit on same line */}
+            {/* Updated remainder positioning */}
             <SkiaText
-              x={
-                xOffset +
-                stepIndex * 50 +
-                ((step.remainder.toString().length + 1) * SPACING) / 2
-              }
+              x={xOffset + step.remainderStartPosition * SPACING}
               y={yOffset + 40}
               text={step.remainder.toString()}
               font={font}
             />
 
+            {/* Updated bring down digit positioning */}
             {step.bringDown !== undefined && (
               <SkiaText
-                x={
-                  xOffset +
-                  stepIndex * 50 +
-                  ((step.remainder.toString().length + 1) * SPACING) / 1
-                }
+                x={xOffset + (step.remainderStartPosition + 1) * SPACING}
                 y={yOffset + 40}
                 text={step.bringDown.toString()}
                 font={font}
@@ -240,22 +317,6 @@ const LongDivisionAnimator = () => {
         {renderDivisor()}
         {renderSteps()}
       </Canvas>
-
-      {currentStep >= 0 && currentStep < steps.length - 1 && (
-        <Pressable style={styles.button} onPress={nextStep}>
-          <Text style={styles.buttonText}>Next Step</Text>
-        </Pressable>
-      )}
-
-      {currentStep === steps.length - 1 && (
-        <View style={styles.resultContainer}>
-          <Text style={styles.resultText}>
-            Final Result: Quotient ={" "}
-            {Math.floor(parseInt(dividend) / parseInt(divisor))}, Remainder ={" "}
-            {parseInt(dividend) % parseInt(divisor)}
-          </Text>
-        </View>
-      )}
     </View>
   );
 };
@@ -263,46 +324,15 @@ const LongDivisionAnimator = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    // alignItems: "flex-start",
-    // justifyContent: "flex-start",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    width: 150,
-    fontSize: 18,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   canvas: {
+    width: 400,
+    padding: 10,
+    // width: "100%",
     minHeight: 400,
-    marginVertical: 20,
-  },
-  resultContainer: {
-    marginTop: 20,
-  },
-  resultText: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: "center",
+    marginVertical: 5,
+    marginLeft: -70,
+    // backgroundColor: "blue",
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { View, StyleSheet, TextInput, Pressable, Text } from "react-native";
 import {
   Canvas,
@@ -7,7 +7,7 @@ import {
   useFont,
   Group,
 } from "@shopify/react-native-skia";
-import {
+import Animated, {
   useDerivedValue,
   useSharedValue,
   withDelay,
@@ -15,9 +15,9 @@ import {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useState } from "react";
 import { useFocusEffect } from "expo-router";
 
-// Types
 type Step = {
   currentDigit: number;
   product: number;
@@ -25,24 +25,33 @@ type Step = {
   position: number;
   currentValue: string;
   bringDown?: number;
+  remainderStartPosition: number;
 };
 
-// Constants
 const SPACING = 50;
 const BASE_X = 150;
-const BASE_Y = 120;
+const BASE_Y = 120; // Increased to make room for line above dividend
 const STEP_HEIGHT = 80;
-const LINE_WIDTH = 200;
+const LINE_WIDTH = 200; // Width for horizontal lines
+
 const STEP_DELAY = 500;
-const ANIMATION_DURATION = 1000;
+const ANIMATION_DURATION = 5000;
 const MAX_STEPS = 10;
 
+type LongDivisionAnimatorProps = {
+  dividend: string;
+  divisor: string;
+};
+
 const LongDivisionAnimator = () => {
-  // State
-  const [dividend, setDividend] = useState("2354");
-  const [divisor, setDivisor] = useState("3");
+  // const LongDivisionAnimator = ({
+  //   dividend = "9572",
+  //   divisor = "8",
+  // }: LongDivisionAnimatorProps) => {
+  const dividend = "9172";
+  const divisor = "8";
   const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(-1);
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Animation shared values
@@ -53,10 +62,8 @@ const LongDivisionAnimator = () => {
     useDerivedValue(() => opacity.value),
   );
 
-  // Load font
   const font = useFont(require("../assets/BlexMonoNerdFont-Regular.ttf"), 24);
 
-  // Calculate division steps
   const calculateSteps = useCallback(() => {
     const divisorNum = parseInt(divisor);
     if (!divisorNum || isNaN(divisorNum)) return;
@@ -66,12 +73,14 @@ const LongDivisionAnimator = () => {
     let currentNumber = "";
     let position = 0;
     let i = 0;
+    let startPosition = 0;
 
     while (i < dividendDigits.length) {
       currentNumber += dividendDigits[i];
       let currentNum = parseInt(currentNumber);
 
       if (currentNum < divisorNum && i < dividendDigits.length - 1) {
+        startPosition++;
         i++;
         continue;
       }
@@ -88,20 +97,21 @@ const LongDivisionAnimator = () => {
         currentValue: currentNumber,
         bringDown:
           i < dividendDigits.length - 1 ? dividendDigits[i + 1] : undefined,
+        remainderStartPosition: startPosition, // Store the position where this step's calculation started
       });
 
       currentNumber = remainder.toString();
       position++;
+      startPosition = i + 1;
       i++;
     }
 
-    // Reset animations
     opacities.forEach((opacity) => {
       opacity.value = 0;
     });
 
     setSteps(newSteps);
-    setCurrentStep(0);
+    setCurrentStep(-1);
     setIsAnimating(false);
   }, [dividend, divisor]);
 
@@ -112,59 +122,61 @@ const LongDivisionAnimator = () => {
     }, [calculateSteps]),
   );
 
+  useEffect(() => {
+    if (currentStep >= -1 && currentStep < steps.length - 1 && !isAnimating) {
+      nextStep();
+    }
+  }, [currentStep, isAnimating, steps]);
+
   // Handle animation of each step
-  const animateStep = useCallback((stepIndex: number) => {
-    if (stepIndex >= MAX_STEPS) return;
+  const animateStep = useCallback(
+    (stepIndex: number) => {
+      if (stepIndex >= MAX_STEPS) return;
 
-    setIsAnimating(true);
+      setIsAnimating(true);
 
-    // Animate current step
-    opacities[stepIndex].value = withSequence(
-      withDelay(STEP_DELAY, withTiming(1, { duration: ANIMATION_DURATION })),
-      withSpring(1),
-    );
+      // Animate current step
+      opacities[stepIndex].value = withSequence(
+        withDelay(STEP_DELAY, withTiming(1, { duration: ANIMATION_DURATION })),
+        withSpring(1),
+      );
 
-    // Enable next step button after animation
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, STEP_DELAY + ANIMATION_DURATION);
-  }, []);
+      // Enable next step button after animation
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, STEP_DELAY + ANIMATION_DURATION);
+    },
+    [currentStep],
+  );
 
-  // Handle next step button press
-  const nextStep = useCallback(() => {
+  const nextStep = () => {
     if (isAnimating) return;
 
     const nextStepIndex = currentStep + 1;
-    if (nextStepIndex < steps.length) {
+    if (currentStep < steps.length - 1) {
       setCurrentStep(nextStepIndex);
       animateStep(nextStepIndex);
     }
-  }, [currentStep, steps.length, isAnimating, animateStep]);
-
-  // Input handlers
-  const handleDividendChange = (text: string) => {
-    if (/^\d*$/.test(text)) {
-      setDividend(text);
-      calculateSteps();
-    }
   };
 
-  const handleDivisorChange = (text: string) => {
-    if (/^\d*$/.test(text)) {
-      setDivisor(text);
-      calculateSteps();
-    }
-  };
+  if (!font) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading font...</Text>
+      </View>
+    );
+  }
 
-  // Render functions
   const renderDivisionSymbol = () => (
     <Group key="division-symbol">
+      {/* Main division line moved above dividend */}
       <Path
         path={`M ${BASE_X - 30} ${BASE_Y - 40} h ${LINE_WIDTH}`}
         strokeWidth={2}
         style="stroke"
         color="#000"
       />
+      {/* Vertical line of division symbol */}
       <Path
         path={`M ${BASE_X - 30} ${BASE_Y - 40} v 60`}
         strokeWidth={2}
@@ -180,7 +192,7 @@ const LongDivisionAnimator = () => {
         <SkiaText
           key={`dividend-${index}`}
           x={BASE_X + index * SPACING}
-          y={BASE_Y - 5}
+          y={BASE_Y - 5} // Positioned below the line
           text={digit}
           font={font}
         />
@@ -201,17 +213,20 @@ const LongDivisionAnimator = () => {
   const renderSteps = () => (
     <Group key="steps">
       {steps.map((step, stepIndex) => {
-        if (stepIndex > currentStep || stepIndex >= MAX_STEPS) return null;
+        if (stepIndex > currentStep) return null;
+        if (stepIndex >= MAX_STEPS) return null;
 
         const xOffset = BASE_X;
-        const yOffset = BASE_Y + stepIndex * STEP_HEIGHT + 40;
+        const yOffset =
+          BASE_Y + stepIndex + 0.2 * STEP_HEIGHT + stepIndex * 80 + 20;
+        const productStr = step.product.toString();
 
         return (
           <Group
             key={`step-${stepIndex}`}
             opacity={derivedOpacities[stepIndex]}
           >
-            {/* Quotient digit */}
+            {/* Keep quotient digit and product rendering the same */}
             <SkiaText
               x={xOffset + step.position * SPACING}
               y={BASE_Y - 60}
@@ -219,29 +234,24 @@ const LongDivisionAnimator = () => {
               font={font}
             />
 
-            {/* Product */}
-            <Group>
+            <Group key="productStr">
               <SkiaText
-                x={xOffset - 20 + stepIndex * 20}
+                x={xOffset - 20 + stepIndex * 50}
                 y={yOffset}
                 text="-"
                 font={font}
               />
-              {step.product
-                .toString()
-                .split("")
-                .map((digit, index) => (
-                  <SkiaText
-                    key={`product-${index}`}
-                    x={xOffset + index * SPACING + stepIndex * 20}
-                    y={yOffset}
-                    text={digit}
-                    font={font}
-                  />
-                ))}
+              {productStr.split("").map((digit, index) => (
+                <SkiaText
+                  key={`dividend-${index}`}
+                  x={xOffset + index * SPACING + stepIndex * 50}
+                  y={yOffset}
+                  text={digit}
+                  font={font}
+                />
+              ))}
             </Group>
 
-            {/* Subtraction line */}
             <Path
               path={`M ${xOffset - 5} ${yOffset + 10} h ${LINE_WIDTH}`}
               strokeWidth={1}
@@ -249,16 +259,18 @@ const LongDivisionAnimator = () => {
               color="#000"
             />
 
-            {/* Remainder and brought down digit */}
+            {/* Updated remainder positioning */}
             <SkiaText
-              x={xOffset + stepIndex * 20}
+              x={xOffset + step.remainderStartPosition * SPACING}
               y={yOffset + 40}
               text={step.remainder.toString()}
               font={font}
             />
+
+            {/* Updated bring down digit positioning */}
             {step.bringDown !== undefined && (
               <SkiaText
-                x={xOffset + stepIndex * 20 + SPACING}
+                x={xOffset + (step.remainderStartPosition + 1) * SPACING}
                 y={yOffset + 40}
                 text={step.bringDown.toString()}
                 font={font}
@@ -270,39 +282,8 @@ const LongDivisionAnimator = () => {
     </Group>
   );
 
-  if (!font) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading font...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <View style={styles.inputWrapper}>
-          <Text style={styles.label}>Dividend:</Text>
-          <TextInput
-            style={styles.input}
-            value={dividend}
-            onChangeText={handleDividendChange}
-            keyboardType="numeric"
-            maxLength={8}
-          />
-        </View>
-        <View style={styles.inputWrapper}>
-          <Text style={styles.label}>Divisor:</Text>
-          <TextInput
-            style={styles.input}
-            value={divisor}
-            onChangeText={handleDivisorChange}
-            keyboardType="numeric"
-            maxLength={4}
-          />
-        </View>
-      </View>
-
       <Canvas
         style={[
           styles.canvas,
@@ -314,28 +295,6 @@ const LongDivisionAnimator = () => {
         {renderDivisor()}
         {renderSteps()}
       </Canvas>
-
-      {currentStep >= 0 && currentStep < steps.length - 1 && (
-        <Pressable
-          style={[styles.button, isAnimating && styles.buttonDisabled]}
-          onPress={nextStep}
-          disabled={isAnimating}
-        >
-          <Text style={styles.buttonText}>
-            {isAnimating ? "Animating..." : "Next Step"}
-          </Text>
-        </Pressable>
-      )}
-
-      {currentStep === steps.length - 1 && (
-        <View style={styles.resultContainer}>
-          <Text style={styles.resultText}>
-            Final Result: Quotient ={" "}
-            {Math.floor(parseInt(dividend) / parseInt(divisor))}, Remainder ={" "}
-            {parseInt(dividend) % parseInt(divisor)}
-          </Text>
-        </View>
-      )}
     </View>
   );
 };
@@ -343,57 +302,15 @@ const LongDivisionAnimator = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  inputWrapper: {
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    width: 120,
-    fontSize: 18,
-    textAlign: "center",
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: "#cccccc",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   canvas: {
-    width: "100%",
+    width: 400,
+    padding: 10,
+    // width: "100%",
     minHeight: 400,
-    marginVertical: 20,
-  },
-  resultContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  resultText: {
-    fontSize: 18,
-    textAlign: "center",
+    marginVertical: 5,
+    marginLeft: -70,
+    // backgroundColor: "blue",
   },
 });
 

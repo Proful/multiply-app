@@ -13,6 +13,7 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { divide, getRandomNumber } from "@/lib/utils";
 import HintModal from "@/components/HintModal";
+import LongDivisionAnimator from "./division_animator";
 
 export default function Division() {
   const [dividend, setDividend] = useState<number>(0);
@@ -97,10 +98,10 @@ export default function Division() {
       >
         <HintModal onCloseModal={closeModal}>
           <View style={styles.row}>
-            <Text style={styles.text}>Quotient: {answer[0]}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.text}>Reminder: {answer[1]}</Text>
+            <LongDivisionAnimator
+              dividend={dividend + ""}
+              divisor={divisor + ""}
+            />
           </View>
         </HintModal>
       </Modal>
