@@ -6,8 +6,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { getRandomNumber } from "@/lib/utils";
+import AnimatedDigit from "@/components/AnimatedDigit";
 
-// AsyncStorage Key
 const STORAGE_KEY = "timestable";
 const FROM_VALUE = 2;
 const TO_VALUE = 10;
@@ -71,29 +71,36 @@ export default function TimesTable() {
         >
           <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
         </TouchableOpacity>
-        {[...Array(10)].map((_, i) => (
-          <View
-            key={i + 1}
-            style={{
-              flexDirection: "row",
-              width: 220,
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={{ fontSize: 26, width: 30, textAlign: "right" }}>
-              {digit}
-            </Text>
-            <Text
-              style={{ fontSize: 26, width: 70, textAlign: "left" }}
-            >{`x   ${i + 1}`}</Text>
-            <Text style={{ fontSize: 28, width: 20, textAlign: "center" }}>
-              =
-            </Text>
-            <Text style={{ fontSize: 28, width: 60, textAlign: "left" }}>
-              {digit * (i + 1)}
-            </Text>
-          </View>
-        ))}
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {[...Array(10)].map((_, i) => (
+            <View
+              key={i + 1}
+              style={{
+                flexDirection: "row",
+                width: 220,
+                justifyContent: "space-between",
+              }}
+            >
+              <AnimatedDigit digit={digit} />
+              <Text
+                style={{ fontSize: 26, width: 70, textAlign: "left" }}
+              >{` x   ${i + 1}`}</Text>
+              <Text style={{ fontSize: 28, width: 20, textAlign: "center" }}>
+                {"=  "}
+              </Text>
+              <AnimatedDigit
+                digit={digit * (i + 1)}
+                style={{ width: 60, textAlign: "left" }}
+              />
+            </View>
+          ))}
+        </View>
       </>
     </View>
   );

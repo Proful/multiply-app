@@ -12,4 +12,5 @@ export const sharedStyles = StyleSheet.create({
   resetButton: { position: "absolute", top: 10, right: 10 },
   resultButton: { position: "absolute", top: 10, left: 10 },
   hintButton: { position: "absolute", bottom: 10, right: 10 },
+  penButton: { position: "absolute", bottom: 10, left: 10 },
 });

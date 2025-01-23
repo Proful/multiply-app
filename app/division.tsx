@@ -14,7 +14,9 @@ import ConfettiCannon from "react-native-confetti-cannon";
 import { divide, getRandomNumber } from "@/lib/utils";
 import HintModal from "@/components/HintModal";
 import LongDivisionAnimator from "./division_animator";
-
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import PenScratchPad from "@/components/PenScratchPad";
+import Confetti01 from "@/components/confetti/confetti01";
 export default function Division() {
   const [dividend, setDividend] = useState<number>(0);
   const [divisor, setDivisor] = useState<number>(0);
@@ -24,6 +26,12 @@ export default function Division() {
   const [answer, setAnswer] = useState<number[]>([0, 0]);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [penModalVisible, setPenModalVisible] = useState(false);
+
+  const openPenModal = () => {
+    setPenModalVisible(true);
+  };
+  const closePenModal = () => setPenModalVisible(false);
 
   const openModal = () => {
     const { quotient, remainder } = divide(dividend, divisor);
@@ -73,9 +81,11 @@ export default function Division() {
         <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
       </TouchableOpacity>
       {result === "correct" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
-        </View>
+        <>
+          <View style={sharedStyles.resultButton}>
+            <Ionicons name="checkmark-circle-outline" size={50} color="green" />
+          </View>
+        </>
       )}
       {result === "wrong" && (
         <View style={sharedStyles.resultButton}>
@@ -89,6 +99,25 @@ export default function Division() {
       >
         <AntDesign name="questioncircle" size={40} color="#bec3c8" />
       </TouchableOpacity>
+
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          position: "absolute",
+          left: 10,
+          bottom: 10,
+          backgroundColor: "#bec3c8",
+        }}
+      >
+        <TouchableOpacity
+          style={{ ...sharedStyles.penButton, marginLeft: 0 }}
+          onPress={openPenModal}
+        >
+          <EvilIcons name="pencil" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
       <Modal
         animationType="slide"
@@ -104,6 +133,15 @@ export default function Division() {
             />
           </View>
         </HintModal>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={penModalVisible}
+        onRequestClose={closePenModal} // Required for Android back button
+      >
+        <PenScratchPad />
       </Modal>
 
       <Text style={{ fontSize: 44 }}>

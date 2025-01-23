@@ -1,4 +1,3 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { View, StyleSheet, TextInput, Pressable, Text } from "react-native";
 import {
   Canvas,
@@ -15,7 +14,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
 
 type Step = {
@@ -44,13 +43,13 @@ type LongDivisionAnimatorProps = {
   divisor: string;
 };
 
-const LongDivisionAnimator = () => {
-  // const LongDivisionAnimator = ({
-  //   dividend = "9572",
-  //   divisor = "8",
-  // }: LongDivisionAnimatorProps) => {
-  const dividend = "9572";
-  const divisor = "8";
+// const LongDivisionAnimator = () => {
+const LongDivisionAnimator = ({
+  dividend = "9572",
+  divisor = "8",
+}: LongDivisionAnimatorProps) => {
+  // const dividend = "9572";
+  // const divisor = "8";
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(-1);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -70,7 +69,7 @@ const LongDivisionAnimator = () => {
     if (!divisorNum || isNaN(divisorNum)) return;
 
     const dividendDigits = dividend.split("").map(Number);
-    const newSteps: Step[] = [];
+    const newSteps = [];
     let currentNumber = "";
     let position = 0;
     let i = 0;
@@ -90,15 +89,28 @@ const LongDivisionAnimator = () => {
       const product = quotientDigit * divisorNum;
       const remainder = currentNum - product;
 
+      let bringDown;
+      if (i < dividendDigits.length - 1) {
+        let nextDigit = dividendDigits[i + 1];
+        // Check if the remainder plus next digit would be less than divisor
+        if (
+          parseInt(remainder + "" + nextDigit) < divisorNum &&
+          i + 2 <= dividendDigits.length
+        ) {
+          bringDown = parseInt(dividendDigits.slice(i + 1, i + 3).join(""));
+        } else {
+          bringDown = parseInt(nextDigit + "");
+        }
+      }
+
       newSteps.push({
         currentDigit: quotientDigit,
         product,
         remainder,
         position,
         currentValue: currentNumber,
-        bringDown:
-          i < dividendDigits.length - 1 ? dividendDigits[i + 1] : undefined,
-        remainderStartPosition: startPosition, // Store the position where this step's calculation started
+        bringDown,
+        remainderStartPosition: startPosition,
         subtractFromPosition:
           currentNumber.length === 1 ? startPosition : startPosition - 1,
       });
@@ -108,11 +120,7 @@ const LongDivisionAnimator = () => {
       startPosition = i + 1;
       i++;
     }
-
-    opacities.forEach((opacity) => {
-      opacity.value = 0;
-    });
-
+    // console.log(JSON.stringify(newSteps, null, 2));
     setSteps(newSteps);
     setCurrentStep(-1);
     setIsAnimating(false);
@@ -231,10 +239,10 @@ const LongDivisionAnimator = () => {
           shiftAlignmentOfProduct = true;
         }
 
-        console.log(
-          `step = ${stepIndex}, xOffset = ${xOffset}, x = ${xOffset + step.subtractFromPosition * SPACING}, sub = ${step.subtractFromPosition}, rem = ${step.remainderStartPosition}`,
-          step,
-        );
+        // console.log(
+        //   `step = ${stepIndex}, xOffset = ${xOffset}, x = ${xOffset + step.subtractFromPosition * SPACING}, sub = ${step.subtractFromPosition}, rem = ${step.remainderStartPosition}`,
+        //   step,
+        // );
 
         return (
           <Group
@@ -324,15 +332,13 @@ const LongDivisionAnimator = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   canvas: {
     width: 400,
-    padding: 10,
-    // width: "100%",
     minHeight: 400,
-    marginVertical: 5,
-    marginLeft: -70,
-    // backgroundColor: "blue",
+    // backgroundColor: "red", // for debugging
   },
 });
 

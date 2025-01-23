@@ -1,12 +1,20 @@
+import AnimatedDigit from "@/components/AnimatedDigit";
 import { sharedStyles } from "@/lib/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 
+//Animation is overkill
 export function Question({ value }: { value: string }) {
+  // return (
+  //   <AnimatedDigit digit={value} style={{ width: "100%", fontSize: 36 }} />
+  // );
   return <Text style={{ fontSize: 36 }}>{value}</Text>;
 }
 export function Answer({ value }: { value: string }) {
+  // return (
+  //   <AnimatedDigit digit={value} style={{ width: "100%", fontSize: 36 }} />
+  // );
   return <Text style={{ fontSize: 36 }}>{value}</Text>;
 }
 export const random = (min: number, max: number) => {
