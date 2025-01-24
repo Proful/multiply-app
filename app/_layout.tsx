@@ -42,7 +42,7 @@ export default function Layout() {
       />
       <Stack.Screen
         name="timestablepractice"
-        options={{ title: "Timestable Practice" }}
+        options={{ title: "Times Table Practice" }}
       />
       <Stack.Screen
         name="multiplication"

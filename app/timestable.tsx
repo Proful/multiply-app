@@ -1,13 +1,14 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useCallback, useEffect } from "react";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { useFocusEffect } from "@react-navigation/native";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { getRandomNumber } from "@/lib/utils";
 import AnimatedDigit from "@/components/AnimatedDigit";
 
+import { router } from "expo-router";
 const STORAGE_KEY = "timestable";
 const FROM_VALUE = 2;
 const TO_VALUE = 10;
@@ -85,6 +86,14 @@ export default function TimesTable() {
         >
           <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={sharedStyles.quizButton}
+          onPress={() => {
+            router.navigate("/quiz/timestable");
+          }}
+        >
+          <AntDesign name="appstore-o" size={24} color="white" />
+        </TouchableOpacity>
         <View
           style={{
             width: "100%",
@@ -103,7 +112,7 @@ export default function TimesTable() {
             >
               <AnimatedDigit digit={digit} />
               <Text
-                style={{ fontSize: 26, width: 70, textAlign: "left" }}
+                style={{ fontSize: 26, width: 72, textAlign: "left" }}
               >{` x   ${i + 1}`}</Text>
               <Text style={{ fontSize: 28, width: 20, textAlign: "center" }}>
                 {"=  "}

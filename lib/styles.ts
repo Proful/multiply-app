@@ -13,4 +13,15 @@ export const sharedStyles = StyleSheet.create({
   resultButton: { position: "absolute", top: 10, left: 10 },
   hintButton: { position: "absolute", bottom: 10, right: 10 },
   penButton: { position: "absolute", bottom: 10, left: 10 },
+  quizButton: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#bec3c8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
