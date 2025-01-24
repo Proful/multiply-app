@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import { useFocusEffect } from "@react-navigation/native";
 import { sharedStyles } from "@/lib/styles";
@@ -13,55 +13,69 @@ const FROM_VALUE = 2;
 const TO_VALUE = 10;
 
 export default function TimesTable() {
-  const [fromValue, setFromValue] = useState(FROM_VALUE);
-  const [toValue, setToValue] = useState(TO_VALUE);
-  const [digit, setDigit] = useState<number>(
-    getRandomNumber(FROM_VALUE, TO_VALUE),
-  ); // Default value from 2 to 10
+  const [fromValue, setFromValue] = useState(-1);
+  const [toValue, setToValue] = useState(-1);
+  const [digit, setDigit] = useState<number>(-1);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+    // Trigger immediately
+    setDigit(
+      getRandomNumber(
+        Number(fromValue) || FROM_VALUE,
+        Number(toValue) || TO_VALUE,
+      ),
+    );
+
+    // Set interval for repeated updates every 15 seconds
+    interval = setInterval(() => {
+      setDigit(
+        getRandomNumber(
+          Number(fromValue) || FROM_VALUE,
+          Number(toValue) || TO_VALUE,
+        ),
+      );
+    }, 15000);
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [fromValue, toValue]);
 
   useFocusEffect(
     useCallback(() => {
-      let interval: unknown;
-
       const loadStoredData = async () => {
+        let from = FROM_VALUE;
+        let to = TO_VALUE;
+
         try {
-          let fromValue = FROM_VALUE,
-            toValue = TO_VALUE;
           const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
+          console.log(storedValue);
+
           if (storedValue) {
-            const { from, to } = JSON.parse(storedValue);
-            fromValue = Number(from);
-            toValue = Number(to);
+            const parsed = JSON.parse(storedValue);
+            from = Number(parsed.from) || FROM_VALUE;
+            to = Number(parsed.to) || TO_VALUE;
           }
         } catch (error) {
           console.error("Failed to load data from AsyncStorage:", error);
         }
-        setFromValue(fromValue);
-        setToValue(toValue);
 
-        const randomNumber = getRandomNumber(fromValue, toValue);
-        setDigit(randomNumber);
-
-        interval = setInterval(() => {
-          const randomNumber = getRandomNumber(fromValue, toValue);
-          setDigit(randomNumber);
-        }, 15000);
+        setFromValue(from);
+        setToValue(to);
       };
-
       loadStoredData();
-      // Cleanup function (optional, can be used for resetting states or cleanup tasks)
-      return () => {
-        if (interval) {
-          //@ts-ignore
-          clearInterval(interval);
-        }
-      };
-    }, []), // Empty dependency array ensures this runs on focus
+    }, []),
   );
+
+  if (digit === -1) {
+    return null;
+  }
 
   return (
     <View style={sharedStyles.screenContainer}>
-      {/* {!isLoaded && <Text>loading</Text>} */}
       <>
         <TouchableOpacity
           style={sharedStyles.resetButton}

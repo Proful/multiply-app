@@ -7,7 +7,7 @@ export default function Index() {
       <View style={styles.row}>
         <View style={styles.column}>
           <TouchableOpacity
-            onPress={() => router.push("/division_animator_anim")}
+            onPress={() => router.push("/timestable")}
             style={styles.press}
           >
             <Text style={styles.text}>Times Table</Text>
