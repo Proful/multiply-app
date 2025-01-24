@@ -1,16 +1,3 @@
-export function compareFloat(a: number, b: number, epsilon = 1e-10) {
-  const difference = a - b;
-  return Math.abs(difference) < epsilon;
-}
-export function compareFloatWithDifference(
-  value: number,
-  a: number,
-  b: number,
-  epsilon = 1e-10,
-) {
-  const difference = a - b;
-  return Math.abs(value - difference) < epsilon;
-}
 export function getRandomNumber(
   min: number | undefined,
   max: number | undefined,
@@ -39,6 +26,18 @@ export function getRandomMultiple(w: number) {
   const randomIndex = Math.floor(Math.random() * multiples.length);
   return multiples[randomIndex];
 }
+export function getRandomNumberFrom(from: number) {
+  const randomNumber = Math.floor(Math.random() * 10) + from;
+  return randomNumber;
+}
+export function getRandomNumberTill(till: number) {
+  const randomNumber = Math.floor(Math.random() * till) + 1;
+  return randomNumber;
+}
+export function getRandomNumberFromArray(arr: number[]) {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
 export function leftPad(num: number, targetLength: number): string {
   return num.toString().padStart(targetLength, "0");
 }
@@ -51,14 +50,6 @@ export function lcm(a: number, b: number): number {
 }
 export function lcmOfThree(a: number, b: number, c: number): number {
   return lcm(lcm(a, b), c);
-}
-export function getRandomNumberFrom(from: number) {
-  const randomNumber = Math.floor(Math.random() * 10) + from;
-  return randomNumber;
-}
-export function getRandomNumberTill(till: number) {
-  const randomNumber = Math.floor(Math.random() * till) + 1;
-  return randomNumber;
 }
 
 export type MixedNumberType = [number, number, number]; // [whole, numerator, denominator]
@@ -323,4 +314,17 @@ export function divide(
   const remainder = dividend % divisor;
 
   return { quotient, remainder };
+}
+export function compareFloat(a: number, b: number, epsilon = 1e-10) {
+  const difference = a - b;
+  return Math.abs(difference) < epsilon;
+}
+export function compareFloatWithDifference(
+  value: number,
+  a: number,
+  b: number,
+  epsilon = 1e-10,
+) {
+  const difference = a - b;
+  return Math.abs(value - difference) < epsilon;
 }

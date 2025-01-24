@@ -1,42 +1,22 @@
-import { Button, Text, View, TextInput, TouchableOpacity } from "react-native";
+import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Fraction from "@/components/Fraction";
 import { sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { getRandomNumber, getRandomNumberFromArray } from "@/lib/utils";
 
 export default function FractionToDecimal() {
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [result, setResult] = useState<string>("");
-  const [selectedOption, setSelectedOption] = useState<string>("option1");
 
-  const handleRadioValueChange = (value: string) => {
-    setSelectedOption(value);
-    if (value === ">") {
-      setResult(firstNumber > secondNumber ? "correct" : "wrong");
-    } else if (value === "<") {
-      setResult(firstNumber < secondNumber ? "correct" : "wrong");
-    } else {
-      setResult(firstNumber === secondNumber ? "correct" : "wrong");
-    }
-  };
-  // Generate random 2 digit number (10-99)
-  const generateTwoDigitNumber = (): number => {
-    return Math.floor(Math.random() * 90) + 10;
-  };
-  function getRandomNumber() {
-    const options = [2, 4, 5, 10];
-    const randomIndex = Math.floor(Math.random() * options.length);
-    return options[randomIndex];
-  }
   const setup = () => {
-    const a = getRandomNumber();
-    const b = Math.floor(Math.random() * a);
-    const c = b === 0 ? 1 : b;
-    setFirstNumber(c);
+    const a = getRandomNumberFromArray([2, 4, 5, 10]);
+    const b = getRandomNumber(1, a - 1);
+    setFirstNumber(b);
     setSecondNumber(a);
     setUserAnswer("");
     setResult("");
@@ -59,16 +39,21 @@ export default function FractionToDecimal() {
           <Ionicons name="close-circle-outline" size={50} color="red" />
         </View>
       )}
-      <Fraction numerator={firstNumber} denominator={secondNumber} />
       <View
         style={{
           flexDirection: "row",
+          marginHorizontal: 30,
+          gap: 15,
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 13 }}>= </Text>
+        <Fraction numerator={firstNumber} denominator={secondNumber} />
+        <Text style={{ fontSize: 24 }}>= </Text>
         <TextInput
-          style={{ fontSize: 28, width: "85%" }}
-          placeholder={"Enter your answer"}
+          style={{ fontSize: 24, width: "20%" }}
+          placeholder={"?"}
+          keyboardType="numeric"
           value={userAnswer}
           onChangeText={(txt) => {
             setUserAnswer(txt);
