@@ -328,3 +328,21 @@ export function compareFloatWithDifference(
   const difference = a - b;
   return Math.abs(value - difference) < epsilon;
 }
+export const darkenColor = (color: string, opacity: number): string => {
+  const hexToRgb = (hex: string): number[] => {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
+
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? [
+          parseInt(result[1], 16),
+          parseInt(result[2], 16),
+          parseInt(result[3], 16),
+        ]
+      : [0, 0, 0];
+  };
+
+  const [r, g, b] = hexToRgb(color);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};

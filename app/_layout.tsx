@@ -4,6 +4,7 @@ import { Stack } from "expo-router/stack";
 import { router } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/lib/styles";
 
 export default function Layout() {
   return (
@@ -13,7 +14,7 @@ export default function Layout() {
           fontWeight: "bold",
         },
         contentStyle: {
-          backgroundColor: "#bec3c8",
+          backgroundColor: colors.primary.bg,
         },
       }}
     >

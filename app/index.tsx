@@ -1,140 +1,46 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import { router } from "expo-router";
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { colors } from "@/lib/styles";
 
 export default function Index() {
+  const router = useRouter();
+
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: { route: string; title: string; description: string };
+    index: number;
+  }) => (
+    <TouchableOpacity
+      onPress={() => router.push(`${item.route}?id=${index}` as any)}
+      style={[
+        styles.press,
+        {
+          backgroundColor: colors.card[index % 10],
+        },
+      ]}
+    >
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.description}>{item.description}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/timestable")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Times Table</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/timestablepractice")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Times Table Practice</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/multiplication")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Multiplication</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/comparingdecimals")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Comparing Decimals</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/fractiontodecimal")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Fraction To Decimal</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/decimaltofraction")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Decimal To Fraction</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/addingdecimals")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Adding Decimals</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/subtractingdecimals")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Subtracting Decimals</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/addingfractions")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Adding Fractions</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/subtractingfractions")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Subtracting Fractions</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/threefractions")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Three Fractions</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/lcm")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>LCM</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/addingmixed")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Adding Mixed Fractions</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/subtractingmixed")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Subtracting Mixed Fractions</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.column}>
-          <TouchableOpacity
-            onPress={() => router.push("/division")}
-            style={styles.press}
-          >
-            <Text style={styles.text}>Division</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.route}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -142,30 +48,121 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center", // Center the grid vertically
-    alignItems: "stretch", // Ensure rows span full width
-  },
-  row: {
-    flexDirection: "row", // Arrange items horizontally
-    flex: 1, // Each row takes up equal vertical space
-  },
-  column: {
-    flex: 1, // Each column takes up equal horizontal space
-    justifyContent: "center", // Center text vertically
-    alignItems: "center", // Center text horizontally
-    backgroundColor: "#f9f9f9",
-    color: "#596066",
-    margin: 8, // Add spacing between columns and rows
-    borderRadius: 8, // Optional: rounded corners
-
-    elevation: 5, // Add box shadow
+    backgroundColor: colors.primary.bg,
+    padding: 16,
   },
   press: {
-    flex: 1, // Each column takes up equal horizontal space
-    justifyContent: "center", // Center text vertically
-    alignItems: "center", // Center text horizontally
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  text: {
-    textAlign: "center",
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#ffffff", // White text for contrast
+    marginBottom: 4,
+  },
+  description: {
+    fontSize: 14,
+    color: "#ffffff", // White text for contrast
   },
 });
+
+const data = [
+  {
+    route: "/timestable",
+    title: "Times Table",
+    description: "Learn and practice multiplication tables.",
+    color: "#4CAF50",
+  }, // Green
+  {
+    route: "/timestablepractice",
+    title: "Times Table Practice",
+    description: "Test your skills with times table exercises.",
+    color: "#2196F3",
+  }, // Blue
+  {
+    route: "/multiplication",
+    title: "Multiplication",
+    description: "Master the art of multiplication.",
+    color: "#FF5722",
+  }, // Deep Orange
+  {
+    route: "/comparingdecimals",
+    title: "Comparing Decimals",
+    description: "Understand how to compare decimal numbers.",
+    color: "#9C27B0",
+  }, // Purple
+  {
+    route: "/fractiontodecimal",
+    title: "Fraction To Decimal",
+    description: "Convert fractions to decimals easily.",
+    color: "#FF9800",
+  }, // Orange
+  {
+    route: "/decimaltofraction",
+    title: "Decimal To Fraction",
+    description: "Learn how to convert decimals into fractions.",
+    color: "#673AB7",
+  }, // Deep Purple
+  {
+    route: "/addingdecimals",
+    title: "Adding Decimals",
+    description: "Practice addition with decimal numbers.",
+    color: "#03A9F4",
+  }, // Light Blue
+  {
+    route: "/subtractingdecimals",
+    title: "Subtracting Decimals",
+    description: "Learn subtraction with decimals.",
+    color: "#E91E63",
+  }, // Pink
+  {
+    route: "/addingfractions",
+    title: "Adding Fractions",
+    description: "Add fractions with ease and precision.",
+    color: "#009688",
+  }, // Teal
+  {
+    route: "/subtractingfractions",
+    title: "Subtracting Fractions",
+    description: "Master subtracting fractions step by step.",
+    color: "#F44336",
+  }, // Red
+  {
+    route: "/threefractions",
+    title: "Three Fractions",
+    description: "Work with three fractions simultaneously.",
+    color: "#795548",
+  }, // Brown
+  {
+    route: "/lcm",
+    title: "LCM",
+    description: "Find the least common multiple (LCM) of numbers.",
+    color: "#FFC107",
+  }, // Amber
+  {
+    route: "/addingmixed",
+    title: "Adding Mixed Fractions",
+    description: "Learn to add mixed fractions effectively.",
+    color: "#607D8B",
+  }, // Blue Gray
+  {
+    route: "/subtractingmixed",
+    title: "Subtracting Mixed Fractions",
+    description: "Master subtraction of mixed fractions.",
+    color: "#8BC34A",
+  }, // Light Green
+  {
+    route: "/division",
+    title: "Division",
+    description: "Sharpen your division skills.",
+    color: "#FFEB3B",
+  }, // Yellow
+];

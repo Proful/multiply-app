@@ -15,13 +15,32 @@ export const sharedStyles = StyleSheet.create({
   penButton: { position: "absolute", bottom: 10, left: 10 },
   quizButton: {
     position: "absolute",
-    top: 10,
-    left: 10,
+    top: 15,
+    left: 15,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#bec3c8",
     alignItems: "center",
     justifyContent: "center",
   },
 });
+
+export const colors = {
+  card: {
+    0: "#4CAF50", // Green
+    1: "#2196F3", // Blue
+    2: "#FF5722", // Deep Orange
+    3: "#607D8B", // Blue Gray
+    4: "#FF9800", // Orange
+    5: "#673AB7", // Deep Purple
+    6: "#795548", // Brown
+    7: "#03A9F4", // Light Blue
+    8: "#E91E63", // Pink
+    9: "#009688", // Teal
+    fg: "#ffffff",
+  } as any,
+  primary: {
+    bg: "#f9f9f9",
+    fg: "black",
+  },
+};
