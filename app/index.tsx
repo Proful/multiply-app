@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { colors } from "@/lib/styles";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function Index() {
   const router = useRouter();
@@ -25,11 +26,38 @@ export default function Index() {
         styles.press,
         {
           backgroundColor: colors.card[index % 10],
+          flexDirection: "row",
+          justifyContent: "space-between",
         },
       ]}
     >
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
+      <View
+        style={{
+          flexWrap: "wrap",
+          flexGrow: 1,
+          width: "75%",
+        }}
+      >
+        <Text style={styles.title}>{item.title}</Text>
+        <View style={{ marginBottom: 10 }} />
+        <Text
+          style={[styles.description, { flexWrap: "wrap", width: "100%" }]}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
+          {item.description}
+        </Text>
+      </View>
+      <View
+        style={{
+          borderColor: colors.card.fg,
+          borderWidth: 1,
+          borderRadius: 5,
+          padding: 18,
+        }}
+      >
+        <AntDesign name="checkcircle" size={24} color="#02cc03" />
+      </View>
     </TouchableOpacity>
   );
 
@@ -63,14 +91,15 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "600",
-    color: "#ffffff", // White text for contrast
-    marginBottom: 4,
+    color: colors.card.fg,
+    textAlign: "left",
   },
   description: {
-    fontSize: 14,
-    color: "#ffffff", // White text for contrast
+    fontSize: 12,
+    color: colors.card.fg,
+    textAlign: "left",
   },
 });
 
