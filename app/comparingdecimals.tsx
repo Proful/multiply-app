@@ -1,17 +1,18 @@
-import { Button, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "expo-router";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import RadioInput from "@/components/RadioInput";
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { getRandomNumber, leftPad } from "@/lib/utils";
-import FiveDigitInput from "@/components/FiveDigitInput";
+import { useLocalSearchParams } from "expo-router";
+import { darkenColor } from "@/lib/utils";
 
 export default function ComparingDecimals() {
+  const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
-  const [userAnswer, setUserAnswer] = useState<string>("");
   const [result, setResult] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<string>("option1");
 
@@ -32,18 +33,27 @@ export default function ComparingDecimals() {
     const b = Number(tmp + "." + leftPad(getRandomNumber(1, 999), 3));
     setFirstNumber(a);
     setSecondNumber(b);
-    setUserAnswer("");
     setResult("");
     setSelectedOption("");
   };
 
   useFocusEffect(useCallback(setup, []));
 
+  const cardBg = colors.card[+(id as string) % 10];
+  const cardBgTint = darkenColor("#ffffff", 0.5);
+
   return (
     <>
-      <View style={sharedStyles.screenContainer}>
+      <View
+        style={[
+          sharedStyles.screenContainer,
+          {
+            backgroundColor: cardBg,
+          },
+        ]}
+      >
         <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-          <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+          <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
         </TouchableOpacity>
         {result === "correct" && (
           <View style={sharedStyles.resultButton}>
@@ -61,7 +71,7 @@ export default function ComparingDecimals() {
             flexDirection: "row",
           }}
         >
-          <Text style={{ fontSize: 44 }}>
+          <Text style={{ fontSize: 44, color: colors.card.fg }}>
             {firstNumber} ? {secondNumber}
           </Text>
         </View>

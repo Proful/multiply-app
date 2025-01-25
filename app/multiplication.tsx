@@ -1,16 +1,18 @@
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import Svg, { Line } from "react-native-svg";
 import ConfettiCannon from "react-native-confetti-cannon";
-import { getRandomNumber } from "@/lib/utils";
+import { darkenColor, getRandomNumber } from "@/lib/utils";
 import FiveDigitInput from "@/components/FiveDigitInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { useLocalSearchParams } from "expo-router";
 const STORAGE_KEY = "multiplication";
 export default function Multiplication() {
+  const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [seed, setSeed] = useState<number>(0);
@@ -58,11 +60,21 @@ export default function Multiplication() {
     }
   };
 
+  const cardBg = colors.card[+(id as string) % 10];
+  const cardBgTint = darkenColor("#ffffff", 0.5);
+
   return (
     <>
-      <View style={sharedStyles.screenContainer}>
+      <View
+        style={[
+          sharedStyles.screenContainer,
+          {
+            backgroundColor: cardBg,
+          },
+        ]}
+      >
         <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-          <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+          <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
         </TouchableOpacity>
         {result === "correct" && (
           <View style={sharedStyles.resultButton}>
@@ -75,9 +87,13 @@ export default function Multiplication() {
           </View>
         )}
         <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 44 }}>{"    " + firstNumber}</Text>
+          <Text style={{ fontSize: 44, color: colors.card.fg }}>
+            {"    " + firstNumber}
+          </Text>
 
-          <Text style={{ fontSize: 44 }}>{"X " + secondNumber}</Text>
+          <Text style={{ fontSize: 44, color: colors.card.fg }}>
+            {"X " + secondNumber}
+          </Text>
 
           <View>
             <Svg height="10" width="250">
@@ -86,7 +102,7 @@ export default function Multiplication() {
                 y1="10"
                 x2="250"
                 y2="10"
-                stroke="black"
+                stroke={colors.card.fg}
                 strokeWidth="2"
               />
             </Svg>
@@ -101,7 +117,7 @@ export default function Multiplication() {
                 y1="10"
                 x2="250"
                 y2="10"
-                stroke="black"
+                stroke={colors.card.fg}
                 strokeWidth="2"
               />
             </Svg>

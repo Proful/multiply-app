@@ -17,12 +17,15 @@ import {
   mixedNumbersWithDifference,
   MixedNumberType,
 } from "@/lib/utils";
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import MixedNumber from "@/components/MixedNumber";
 import HintModal from "@/components/HintModal";
+import { useLocalSearchParams } from "expo-router";
+import { darkenColor } from "@/lib/utils";
 
 export default function SubtractingMixed() {
+  const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<MixedNumberType>([0, 0, 0]);
   const [secondNumber, setSecondNumber] = useState<MixedNumberType>([0, 0, 0]);
   const [answer, setAnswer] = useState<MixedNumberType>([0, 0, 0]);
@@ -104,10 +107,20 @@ export default function SubtractingMixed() {
     }
   }
 
+  const cardBg = colors.card[+(id as string) % 10];
+  const cardBgTint = darkenColor("#ffffff", 0.5);
+
   return (
-    <View style={sharedStyles.screenContainer}>
+    <View
+      style={[
+        sharedStyles.screenContainer,
+        {
+          backgroundColor: cardBg,
+        },
+      ]}
+    >
       <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
       </TouchableOpacity>
       {result === "correct" && (
         <View style={sharedStyles.resultButton}>
@@ -155,7 +168,9 @@ export default function SubtractingMixed() {
           denominator={firstNumber[2]}
         />
         <View>
-          <Text style={{ fontSize: 24, margin: 10 }}>-</Text>
+          <Text style={{ fontSize: 24, margin: 10, color: colors.card.fg }}>
+            -
+          </Text>
         </View>
         <MixedNumber
           wholeNumber={secondNumber[0]}
@@ -169,13 +184,15 @@ export default function SubtractingMixed() {
           flexDirection: "row",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 42 }}>= </Text>
+        <Text style={{ fontSize: 24, marginTop: 42, color: colors.card.fg }}>
+          ={" "}
+        </Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View>
             <TextInput
               keyboardType="number-pad"
               maxLength={2}
-              style={styles.input}
+              style={[styles.input, { color: colors.card.fg }]}
               value={wholeNumber}
               onChangeText={(txt) => checkAnswer(txt, "WHOLE_NUMBER")}
             />
@@ -183,16 +200,16 @@ export default function SubtractingMixed() {
           <View>
             <View>
               <TextInput
-                style={{ fontSize: 24 }}
-                placeholder={"Enter Numerator"}
+                style={{ fontSize: 24, color: colors.card.fg }}
+                placeholder={"?"}
                 value={numerator}
                 onChangeText={(txt) => checkAnswer(txt, "NUMERATOR")}
               />
             </View>
             <FractionLine />
             <TextInput
-              style={{ fontSize: 24 }}
-              placeholder={"Enter Denominator"}
+              style={{ fontSize: 24, color: colors.card.fg }}
+              placeholder={"?"}
               value={denominator}
               onChangeText={(txt) => checkAnswer(txt, "DENOMINATOR")}
             />
@@ -200,7 +217,7 @@ export default function SubtractingMixed() {
         </View>
       </View>
       <View style={{ alignSelf: "flex-start", marginLeft: 20, marginTop: 20 }}>
-        <Text>
+        <Text style={{ color: colors.card.fg }}>
           Is common denominator?: {isCommonDenominator ? "Yes" : "No"}
         </Text>
       </View>
@@ -212,7 +229,14 @@ const FractionLine = () => {
   return (
     <View>
       <Svg height="10" width="200">
-        <Line x1="0" y1="10" x2="200" y2="10" stroke="black" strokeWidth="2" />
+        <Line
+          x1="0"
+          y1="10"
+          x2="200"
+          y2="10"
+          stroke={colors.card.fg}
+          strokeWidth="2"
+        />
       </Svg>
     </View>
   );

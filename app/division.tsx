@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { divide, getRandomNumber } from "@/lib/utils";
@@ -16,14 +16,16 @@ import HintModal from "@/components/HintModal";
 import LongDivisionAnimator from "./division_animator";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import PenScratchPad from "@/components/PenScratchPad";
-import Confetti01 from "@/components/confetti/confetti01";
+import { useLocalSearchParams } from "expo-router";
+import { darkenColor } from "@/lib/utils";
+
 export default function Division() {
+  const { id } = useLocalSearchParams();
   const [dividend, setDividend] = useState<number>(0);
   const [divisor, setDivisor] = useState<number>(0);
   const [userQuotient, setUserQuotient] = useState<string>("");
   const [userReminder, setUserReminder] = useState<string>("");
   const [result, setResult] = useState<string>("");
-  const [answer, setAnswer] = useState<number[]>([0, 0]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [penModalVisible, setPenModalVisible] = useState(false);
@@ -34,8 +36,6 @@ export default function Division() {
   const closePenModal = () => setPenModalVisible(false);
 
   const openModal = () => {
-    const { quotient, remainder } = divide(dividend, divisor);
-    setAnswer([quotient, remainder]);
     setModalVisible(true);
   };
   const closeModal = () => setModalVisible(false);
@@ -75,10 +75,20 @@ export default function Division() {
     }
   };
 
+  const cardBg = colors.card[+(id as string) % 10];
+  const cardBgTint = darkenColor("#ffffff", 0.5);
+
   return (
-    <View style={sharedStyles.screenContainer}>
+    <View
+      style={[
+        sharedStyles.screenContainer,
+        {
+          backgroundColor: cardBg,
+        },
+      ]}
+    >
       <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
       </TouchableOpacity>
       {result === "correct" && (
         <>
@@ -156,7 +166,7 @@ export default function Division() {
         <Text style={{ fontSize: 24, marginTop: 10 }}>Quotient = </Text>
         <TextInput
           style={{ fontSize: 24, width: "75%" }}
-          placeholder={"Enter Answer"}
+          placeholder={"?"}
           value={userQuotient}
           keyboardType="numeric"
           onChangeText={(txt) => checkAnswer(txt, "QUOTIENT")}
@@ -171,7 +181,7 @@ export default function Division() {
         <Text style={{ fontSize: 24, marginTop: 10 }}>Reminder = </Text>
         <TextInput
           style={{ fontSize: 24, width: "75%" }}
-          placeholder={"Enter Answer"}
+          placeholder={"?"}
           value={userReminder}
           keyboardType="numeric"
           onChangeText={(txt) => checkAnswer(txt, "REMAINDER")}

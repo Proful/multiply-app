@@ -1,3 +1,4 @@
+import { colors } from "@/lib/styles";
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View, StyleSheet } from "react-native";
 
@@ -82,6 +83,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 8,
+    color: colors.card.fg,
   },
 });
 

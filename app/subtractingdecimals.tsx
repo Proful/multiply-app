@@ -1,12 +1,15 @@
-import { Text, View, TextInput, Button, TouchableOpacity } from "react-native";
+import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { compareFloatWithDifference } from "@/lib/utils";
+import { useLocalSearchParams } from "expo-router";
+import { darkenColor } from "@/lib/utils";
 
 export default function SubtractingDecimals() {
+  const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -30,10 +33,20 @@ export default function SubtractingDecimals() {
 
   useFocusEffect(useCallback(setup, []));
 
+  const cardBg = colors.card[+(id as string) % 10];
+  const cardBgTint = darkenColor("#ffffff", 0.5);
+
   return (
-    <View style={sharedStyles.screenContainer}>
+    <View
+      style={[
+        sharedStyles.screenContainer,
+        {
+          backgroundColor: cardBg,
+        },
+      ]}
+    >
       <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
       </TouchableOpacity>
       {result === "correct" && (
         <View style={sharedStyles.resultButton}>
@@ -45,7 +58,7 @@ export default function SubtractingDecimals() {
           <Ionicons name="close-circle-outline" size={50} color="red" />
         </View>
       )}
-      <Text style={{ fontSize: 44 }}>
+      <Text style={{ fontSize: 44, color: colors.card.fg }}>
         {firstNumber} - {secondNumber}
       </Text>
       <View
@@ -53,10 +66,12 @@ export default function SubtractingDecimals() {
           flexDirection: "row",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 10 }}>= </Text>
+        <Text style={{ fontSize: 24, marginTop: 10, color: colors.card.fg }}>
+          ={" "}
+        </Text>
         <TextInput
-          style={{ fontSize: 24, width: "75%" }}
-          placeholder={"Enter Answer"}
+          style={{ fontSize: 24, width: "75%", color: colors.card.fg }}
+          placeholder={"?"}
           value={userAnswer}
           onChangeText={(txt) => {
             setUserAnswer(txt);

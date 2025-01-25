@@ -2,12 +2,15 @@ import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Fraction from "@/components/Fraction";
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { getRandomNumber, getRandomNumberFromArray } from "@/lib/utils";
+import { useLocalSearchParams } from "expo-router";
+import { darkenColor } from "@/lib/utils";
 
 export default function FractionToDecimal() {
+  const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
@@ -24,10 +27,20 @@ export default function FractionToDecimal() {
 
   useFocusEffect(useCallback(setup, []));
 
+  const cardBg = colors.card[+(id as string) % 10];
+  const cardBgTint = darkenColor("#ffffff", 0.5);
+
   return (
-    <View style={sharedStyles.screenContainer}>
+    <View
+      style={[
+        sharedStyles.screenContainer,
+        {
+          backgroundColor: cardBg,
+        },
+      ]}
+    >
       <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color="#bec3c8" />
+        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
       </TouchableOpacity>
       {result === "correct" && (
         <View style={sharedStyles.resultButton}>
@@ -49,9 +62,9 @@ export default function FractionToDecimal() {
         }}
       >
         <Fraction numerator={firstNumber} denominator={secondNumber} />
-        <Text style={{ fontSize: 24 }}>= </Text>
+        <Text style={{ fontSize: 24, color: colors.card.fg }}>= </Text>
         <TextInput
-          style={{ fontSize: 24, width: "20%" }}
+          style={{ fontSize: 24, width: "20%", color: colors.card.fg }}
           placeholder={"?"}
           keyboardType="numeric"
           value={userAnswer}

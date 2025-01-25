@@ -1,3 +1,4 @@
+import { colors } from "@/lib/styles";
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
   },
   radioButtonLabel: {
     fontSize: 20,
-    color: "#333",
+    color: colors.card.fg,
   },
 });
 

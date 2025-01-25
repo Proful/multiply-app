@@ -1,3 +1,4 @@
+import { colors } from "@/lib/styles";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
@@ -34,7 +35,14 @@ const MixedNumber: React.FC<MexedNumberProps> = ({
 const LineExample = () => (
   <View>
     <Svg height="10" width="50">
-      <Line x1="0" y1="10" x2="50" y2="10" stroke="black" strokeWidth="2" />
+      <Line
+        x1="0"
+        y1="10"
+        x2="50"
+        y2="10"
+        stroke={colors.card.fg}
+        strokeWidth="2"
+      />
     </Svg>
   </View>
 );
@@ -49,6 +57,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginRight: 8,
+    color: colors.card.fg,
   },
   fractionContainer: {
     flexDirection: "column",
@@ -58,16 +67,18 @@ const styles = StyleSheet.create({
   numerator: {
     fontSize: 24,
     fontWeight: "bold",
+    color: colors.card.fg,
   },
   line: {
     width: "150%",
     height: 2,
-    backgroundColor: "black",
+    backgroundColor: colors.card.fg,
     marginVertical: 4,
   },
   denominator: {
     fontSize: 24,
     fontWeight: "bold",
+    color: colors.card.fg,
   },
 });
 

@@ -1,13 +1,14 @@
-import { sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 
+import { useLocalSearchParams } from "expo-router";
 export function Question({ value }: { value: string }) {
-  return <Text style={{ fontSize: 36 }}>{value}</Text>;
+  return <Text style={{ fontSize: 36, color: colors.card.fg }}>{value}</Text>;
 }
 export function Answer({ value }: { value: string }) {
-  return <Text style={{ fontSize: 36 }}>{value}</Text>;
+  return <Text style={{ fontSize: 36, color: colors.card.fg }}>{value}</Text>;
 }
 export const random = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -45,7 +46,9 @@ const multiply = async function* (): AsyncGenerator<
 };
 
 export default function TimestablePractice() {
+  const { id } = useLocalSearchParams();
   const [content, setContent] = useState(<></>);
+
   const logic = async (
     op: () => AsyncGenerator<JSX.Element, void, unknown>,
   ) => {
@@ -71,8 +74,17 @@ export default function TimestablePractice() {
     };
   }, []);
 
+  const cardBg = colors.card[+(id as string) % 10];
+
   return (
-    <View style={sharedStyles.screenContainer}>
+    <View
+      style={[
+        sharedStyles.screenContainer,
+        {
+          backgroundColor: cardBg,
+        },
+      ]}
+    >
       <View>{content}</View>
     </View>
   );
