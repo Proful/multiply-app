@@ -1,4 +1,4 @@
-import { colors } from "@/lib/styles";
+import { colors, fonts } from "@/lib/styles";
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View, StyleSheet } from "react-native";
 
@@ -17,7 +17,7 @@ const FiveDigitInput = ({ seed, onDigit }: FiveDigitInputProps) => {
 
   const handleChange = (text: string, index: number) => {
     if (text.length > 1) return; // Prevent more than 1 character
-    if (!/^\d?$/.test(text)) return; // Allow only digits
+    if (!/^\d?(\.\d*)?$/.test(text)) return; // Allow digits and a single period
 
     const newDigits = [...digits];
     newDigits[index] = text;
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     textAlign: "center",
-    fontSize: 18,
+    fontSize: fonts.secondary,
     marginHorizontal: 4,
     padding: 10,
     width: 50,

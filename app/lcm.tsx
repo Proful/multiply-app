@@ -6,6 +6,8 @@ import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
 
 export default function LCM() {
   const { id } = useLocalSearchParams();
@@ -13,6 +15,9 @@ export default function LCM() {
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   const setup = () => {
     const a = getRandomMultiple(getRandomNumber(undefined, undefined))!;
@@ -24,6 +29,22 @@ export default function LCM() {
   };
 
   useFocusEffect(useCallback(setup, []));
+
+  if (!loaded && !error) {
+    return null;
+  }
+
+  const checkAnswer = (txt: string) => {
+    setUserAnswer(txt);
+
+    if (txt) {
+      if (Number(txt) === lcm(firstNumber, secondNumber)) {
+        setResult("correct");
+      } else {
+        setResult("wrong");
+      }
+    }
+  };
 
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
@@ -56,33 +77,25 @@ export default function LCM() {
             flexDirection: "row",
           }}
         >
-          <Text style={{ fontSize: 44, color: colors.card.fg }}>
+          <MText>
             {firstNumber} and {secondNumber}
-          </Text>
+          </MText>
         </View>
         <View
           style={{
             flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 30,
           }}
         >
-          <Text style={{ fontSize: 24, marginTop: 10, color: colors.card.fg }}>
-            ={" "}
-          </Text>
+          <MText>=</MText>
           <TextInput
-            style={{ fontSize: 24, width: "55%", color: colors.card.fg }}
+            style={sharedStyles.textInput}
+            placeholderTextColor={colors.card.fg}
             placeholder={"?"}
             value={userAnswer}
-            onChangeText={(txt) => {
-              setUserAnswer(txt);
-
-              if (txt) {
-                if (Number(txt) === lcm(firstNumber, secondNumber)) {
-                  setResult("correct");
-                } else {
-                  setResult("wrong");
-                }
-              }
-            }}
+            onChangeText={checkAnswer}
           />
         </View>
       </View>

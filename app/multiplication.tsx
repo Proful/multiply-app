@@ -1,15 +1,18 @@
-import { colors, sharedStyles } from "@/lib/styles";
+import { colors, fonts, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import React, { useState, useCallback, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import React, { useState, useCallback } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import Svg, { Line } from "react-native-svg";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { darkenColor, getRandomNumber } from "@/lib/utils";
 import FiveDigitInput from "@/components/FiveDigitInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { useLocalSearchParams } from "expo-router";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
+import { FractionLine } from "@/components/FractionLine";
+
 const STORAGE_KEY = "multiplication";
 export default function Multiplication() {
   const { id } = useLocalSearchParams();
@@ -17,6 +20,9 @@ export default function Multiplication() {
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [seed, setSeed] = useState<number>(0);
   const [result, setResult] = useState<string>("");
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   const setup = () => {
     const loadStoredData = async () => {
@@ -63,6 +69,10 @@ export default function Multiplication() {
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
 
+  if (!loaded && !error) {
+    return null;
+  }
+
   return (
     <>
       <View
@@ -87,41 +97,19 @@ export default function Multiplication() {
           </View>
         )}
         <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 44, color: colors.card.fg }}>
-            {"    " + firstNumber}
-          </Text>
-
-          <Text style={{ fontSize: 44, color: colors.card.fg }}>
-            {"X " + secondNumber}
-          </Text>
+          <MText>{firstNumber}</MText>
 
           <View>
-            <Svg height="10" width="250">
-              <Line
-                x1="0"
-                y1="10"
-                x2="250"
-                y2="10"
-                stroke={colors.card.fg}
-                strokeWidth="2"
-              />
-            </Svg>
+            <MText>{secondNumber}</MText>
+            <MText style={{ position: "absolute", top: 0, left: -40 }}>
+              {"X"}
+            </MText>
           </View>
 
+          <FractionLine w={250} />
           <FiveDigitInput seed={seed} />
           <FiveDigitInput seed={seed} />
-          <View>
-            <Svg height="10" width="250">
-              <Line
-                x1="0"
-                y1="10"
-                x2="250"
-                y2="10"
-                stroke={colors.card.fg}
-                strokeWidth="2"
-              />
-            </Svg>
-          </View>
+          <FractionLine w={250} />
           <FiveDigitInput onDigit={checkAnswer} seed={seed} />
 
           {result === "correct" && (
@@ -138,3 +126,18 @@ export default function Multiplication() {
     </>
   );
 }
+
+const Divider = () => (
+  <View>
+    <Svg height="10" width="250">
+      <Line
+        x1="0"
+        y1="10"
+        x2="250"
+        y2="10"
+        stroke={colors.card.fg}
+        strokeWidth="2"
+      />
+    </Svg>
+  </View>
+);

@@ -23,6 +23,9 @@ import MixedNumber from "@/components/MixedNumber";
 import HintModal from "@/components/HintModal";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
+import { FractionLine } from "@/components/FractionLine";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
 
 export default function SubtractingMixed() {
   const { id } = useLocalSearchParams();
@@ -38,6 +41,9 @@ export default function SubtractingMixed() {
   const [denominator, setDenominator] = useState<string>("");
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   const openModal = () => {
     setAnswer(mixedNumbersWithDifference(firstNumber, secondNumber));
@@ -107,6 +113,10 @@ export default function SubtractingMixed() {
     }
   }
 
+  if (!loaded && !error) {
+    return null;
+  }
+
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
 
@@ -160,6 +170,9 @@ export default function SubtractingMixed() {
       <View
         style={{
           flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 10,
         }}
       >
         <MixedNumber
@@ -167,11 +180,7 @@ export default function SubtractingMixed() {
           numerator={firstNumber[1]}
           denominator={firstNumber[2]}
         />
-        <View>
-          <Text style={{ fontSize: 24, margin: 10, color: colors.card.fg }}>
-            -
-          </Text>
-        </View>
+        <MText>-</MText>
         <MixedNumber
           wholeNumber={secondNumber[0]}
           numerator={secondNumber[1]}
@@ -182,11 +191,12 @@ export default function SubtractingMixed() {
       <View
         style={{
           flexDirection: "row",
+          alignItems: "center",
+          gap: 20,
+          marginTop: 30,
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 42, color: colors.card.fg }}>
-          ={" "}
-        </Text>
+        <MText>=</MText>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View>
             <TextInput
@@ -200,15 +210,17 @@ export default function SubtractingMixed() {
           <View>
             <View>
               <TextInput
-                style={{ fontSize: 24, color: colors.card.fg }}
+                style={sharedStyles.textInput}
+                placeholderTextColor={colors.card.fg}
                 placeholder={"?"}
                 value={numerator}
                 onChangeText={(txt) => checkAnswer(txt, "NUMERATOR")}
               />
             </View>
-            <FractionLine />
+            <FractionLine w={200} />
             <TextInput
-              style={{ fontSize: 24, color: colors.card.fg }}
+              style={sharedStyles.textInput}
+              placeholderTextColor={colors.card.fg}
               placeholder={"?"}
               value={denominator}
               onChangeText={(txt) => checkAnswer(txt, "DENOMINATOR")}
@@ -224,23 +236,6 @@ export default function SubtractingMixed() {
     </View>
   );
 }
-
-const FractionLine = () => {
-  return (
-    <View>
-      <Svg height="10" width="200">
-        <Line
-          x1="0"
-          y1="10"
-          x2="200"
-          y2="10"
-          stroke={colors.card.fg}
-          strokeWidth="2"
-        />
-      </Svg>
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   input: {

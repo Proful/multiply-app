@@ -1,11 +1,14 @@
-import { Text, View, TextInput, TouchableOpacity } from "react-native";
+import { View, TextInput, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Svg, { Line } from "react-native-svg";
-import { colors, sharedStyles } from "@/lib/styles";
+import { colors, fonts, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { darkenColor } from "@/lib/utils";
+import { darkenColor, getRandomNumberFromArray } from "@/lib/utils";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
+import { FractionLine } from "@/components/FractionLine";
 
 export default function DecimalToFraction() {
   const { id } = useLocalSearchParams();
@@ -13,15 +16,12 @@ export default function DecimalToFraction() {
   const [numerator, setNumerator] = useState<string>("");
   const [denominator, setDenominator] = useState<string>("");
   const [result, setResult] = useState<string>("");
-
-  function getRandomNumber() {
-    const options = [2, 4, 5, 10];
-    const randomIndex = Math.floor(Math.random() * options.length);
-    return options[randomIndex];
-  }
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   const setup = () => {
-    const a = getRandomNumber();
+    const a = getRandomNumberFromArray([2, 4, 5, 10]);
     setFirstNumber(Number("0." + a));
     setNumerator("");
     setDenominator("");
@@ -29,6 +29,31 @@ export default function DecimalToFraction() {
   };
 
   useFocusEffect(useCallback(setup, []));
+
+  function checkAnswer(text: string, type: string) {
+    let b = numerator,
+      c = denominator;
+
+    if (type === "NUMERATOR") {
+      b = text;
+      setNumerator(b);
+    } else if (type === "DENOMINATOR") {
+      c = text;
+      setDenominator(c);
+    }
+
+    if (b && c) {
+      const isMatch = +b / +c === firstNumber;
+
+      setResult(isMatch ? "correct" : "wrong");
+    } else {
+      setResult("wrong");
+    }
+  }
+
+  if (!loaded && !error) {
+    return null;
+  }
 
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
@@ -39,6 +64,8 @@ export default function DecimalToFraction() {
         sharedStyles.screenContainer,
         {
           backgroundColor: cardBg,
+          justifyContent: "center",
+          alignItems: "center",
         },
       ]}
     >
@@ -55,58 +82,35 @@ export default function DecimalToFraction() {
           <Ionicons name="close-circle-outline" size={50} color="red" />
         </View>
       )}
-      <Text style={{ fontSize: 44, color: colors.card.fg }}>{firstNumber}</Text>
+
       <View
         style={{
           flexDirection: "row",
+          marginHorizontal: 40,
+          gap: 15,
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 45, color: colors.card.fg }}>
-          ={" "}
-        </Text>
+        <MText>{firstNumber}</MText>
+        <MText>=</MText>
         <View>
           <TextInput
-            style={{ fontSize: 24, color: colors.card.fg }}
+            style={sharedStyles.textInput}
+            placeholderTextColor={colors.card.fg}
             placeholder={"?"}
             value={numerator}
-            onChangeText={(txt) => {
-              setNumerator(txt);
-
-              if (txt && Number(denominator) !== 0) {
-                if (Number(txt) / Number(denominator) === firstNumber) {
-                  setResult("correct");
-                } else {
-                  setResult("wrong");
-                }
-              }
-            }}
+            onChangeText={(txt) => checkAnswer(txt, "NUMERATOR")}
           />
-          <View>
-            <Svg height="10" width="200">
-              <Line
-                x1="0"
-                y1="10"
-                x2="200"
-                y2="10"
-                stroke={colors.card.fg}
-                strokeWidth="2"
-              />
-            </Svg>
-          </View>
+
+          <FractionLine w={50} />
+
           <TextInput
-            style={{ fontSize: 24, color: colors.card.fg }}
+            style={sharedStyles.textInput}
+            placeholderTextColor={colors.card.fg}
             placeholder={"?"}
             value={denominator}
-            onChangeText={(txt) => {
-              setDenominator(txt);
-              if (txt && Number(txt) !== 0) {
-                if (Number(numerator) / Number(txt) === firstNumber) {
-                  setResult("correct");
-                } else {
-                  setResult("wrong");
-                }
-              }
-            }}
+            onChangeText={(txt) => checkAnswer(txt, "DENOMINATOR")}
           />
         </View>
       </View>

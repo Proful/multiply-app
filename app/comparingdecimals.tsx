@@ -2,12 +2,14 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import RadioInput from "@/components/RadioInput";
-import { colors, sharedStyles } from "@/lib/styles";
+import { colors, fonts, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { getRandomNumber, leftPad } from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
 
 export default function ComparingDecimals() {
   const { id } = useLocalSearchParams();
@@ -15,6 +17,9 @@ export default function ComparingDecimals() {
   const [secondNumber, setSecondNumber] = useState<number>(0);
   const [result, setResult] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<string>("option1");
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   const handleRadioValueChange = (value: string) => {
     setSelectedOption(value);
@@ -41,6 +46,10 @@ export default function ComparingDecimals() {
 
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
+
+  if (!loaded && !error) {
+    return null;
+  }
 
   return (
     <>
@@ -71,15 +80,17 @@ export default function ComparingDecimals() {
             flexDirection: "row",
           }}
         >
-          <Text style={{ fontSize: 44, color: colors.card.fg }}>
+          <MText>
             {firstNumber} ? {secondNumber}
-          </Text>
+          </MText>
         </View>
+
         <RadioInput
           options={[">", "<", "="]}
           value={selectedOption}
           onValueChange={handleRadioValueChange}
         />
+
         {result === "correct" && (
           <ConfettiCannon
             count={200} // Number of particles

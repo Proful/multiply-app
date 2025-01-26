@@ -2,6 +2,8 @@ import { colors } from "@/lib/styles";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Line } from "react-native-svg";
+import { FractionLine } from "./FractionLine";
+import MText from "./MText";
 
 interface MexedNumberProps {
   wholeNumber: number;
@@ -18,13 +20,11 @@ const MixedNumber: React.FC<MexedNumberProps> = ({
     <View style={{ alignItems: "flex-start" }}>
       <View style={styles.container}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.wholeNumber}>
-            {wholeNumber === 0 ? "" : wholeNumber}
-          </Text>
+          <MText>{wholeNumber === 0 ? "" : wholeNumber}</MText>
           <View style={styles.fractionContainer}>
-            <Text style={styles.numerator}>{numerator}</Text>
-            <LineExample />
-            <Text style={styles.denominator}>{denominator}</Text>
+            <MText>{numerator}</MText>
+            <FractionLine w={50} />
+            <MText>{denominator}</MText>
           </View>
         </View>
       </View>
@@ -32,20 +32,6 @@ const MixedNumber: React.FC<MexedNumberProps> = ({
   );
 };
 
-const LineExample = () => (
-  <View>
-    <Svg height="10" width="50">
-      <Line
-        x1="0"
-        y1="10"
-        x2="50"
-        y2="10"
-        stroke={colors.card.fg}
-        strokeWidth="2"
-      />
-    </Svg>
-  </View>
-);
 const styles = StyleSheet.create({
   container: {
     // alignItems: "flex-start",

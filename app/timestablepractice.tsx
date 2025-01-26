@@ -1,18 +1,12 @@
-import { colors, sharedStyles } from "@/lib/styles";
+import { colors, fonts, sharedStyles } from "@/lib/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 
+import { useFonts } from "expo-font";
 import { useLocalSearchParams } from "expo-router";
-export function Question({ value }: { value: string }) {
-  return <Text style={{ fontSize: 36, color: colors.card.fg }}>{value}</Text>;
-}
-export function Answer({ value }: { value: string }) {
-  return <Text style={{ fontSize: 36, color: colors.card.fg }}>{value}</Text>;
-}
-export const random = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-};
+import MText from "@/components/MText";
+import { getRandomNumber } from "@/lib/utils";
 
 const INTERVAL_TIME = 4000; //display Question
 const TIMEOUT_TIME = 2000; //display answer
@@ -38,14 +32,17 @@ const multiply = async function* (): AsyncGenerator<
     console.error("Failed to load data from AsyncStorage:", error);
   }
 
-  const a = random(fromValue, toValue);
-  const b = random(2, 9);
+  const a = getRandomNumber(fromValue, toValue);
+  const b = getRandomNumber(2, 9);
 
-  yield <Question value={`${a} X ${b} = ?`} />;
-  yield <Answer value={`${a} X ${b} = ${a * b}`} />;
+  yield <MText>{`${a} X ${b} = ?`}</MText>;
+  yield <MText>{`${a} X ${b} = ${a * b}`}</MText>;
 };
 
 export default function TimestablePractice() {
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
   const { id } = useLocalSearchParams();
   const [content, setContent] = useState(<></>);
 
@@ -76,6 +73,9 @@ export default function TimestablePractice() {
 
   const cardBg = colors.card[+(id as string) % 10];
 
+  if (!loaded && !error) {
+    return null;
+  }
   return (
     <View
       style={[

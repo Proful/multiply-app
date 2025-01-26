@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useCallback, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -7,7 +7,8 @@ import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { darkenColor, getRandomNumber } from "@/lib/utils";
 import AnimatedDigit from "@/components/AnimatedDigit";
-
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 const STORAGE_KEY = "timestable";
@@ -19,6 +20,9 @@ export default function TimesTable() {
   const [fromValue, setFromValue] = useState(-1);
   const [toValue, setToValue] = useState(-1);
   const [digit, setDigit] = useState<number>(-1);
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -55,7 +59,6 @@ export default function TimesTable() {
 
         try {
           const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
-          console.log(storedValue);
 
           if (storedValue) {
             const parsed = JSON.parse(storedValue);
@@ -74,6 +77,10 @@ export default function TimesTable() {
   );
 
   if (digit === -1) {
+    return null;
+  }
+
+  if (!loaded && !error) {
     return null;
   }
 
@@ -113,37 +120,22 @@ export default function TimesTable() {
             alignItems: "center",
           }}
         >
-          {[...Array(10)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <View
-              key={i + 1}
+              key={i}
               style={{
                 flexDirection: "row",
-                width: 220,
-                justifyContent: "space-between",
+                gap: 5,
               }}
             >
-              <AnimatedDigit digit={digit} style={{ color: colors.card.fg }} />
-              <Text
-                style={{
-                  fontSize: 26,
-                  width: 72,
-                  textAlign: "left",
-                  color: colors.card.fg,
-                }}
-              >{` x   ${i + 1}`}</Text>
-              <Text
-                style={{
-                  fontSize: 28,
-                  width: 20,
-                  textAlign: "center",
-                  color: colors.card.fg,
-                }}
-              >
-                {"=  "}
-              </Text>
+              <AnimatedDigit digit={digit} />
+              <MText>{`X`}</MText>
+              <MText>{`${i + 2}`}</MText>
+              <MText>{"="}</MText>
               <AnimatedDigit
-                digit={digit * (i + 1)}
-                style={{ width: 60, textAlign: "left", color: colors.card.fg }}
+                digit={
+                  digit * (i + 2) < 10 ? ` ${digit * (i + 2)}` : digit * (i + 2)
+                }
               />
             </View>
           ))}

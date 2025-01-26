@@ -1,30 +1,5 @@
 import { StyleSheet } from "react-native";
 
-export const sharedStyles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 20,
-    borderRadius: 10,
-    backgroundColor: "white",
-  },
-  resetButton: { position: "absolute", top: 10, right: 10 },
-  resultButton: { position: "absolute", top: 10, left: 10 },
-  hintButton: { position: "absolute", bottom: 10, right: 10 },
-  penButton: { position: "absolute", bottom: 10, left: 10 },
-  quizButton: {
-    position: "absolute",
-    top: 15,
-    left: 15,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-
 export const colors = {
   card: {
     0: "#4CAF50", // Green
@@ -44,3 +19,37 @@ export const colors = {
     fg: "black",
   },
 };
+
+export const fonts = {
+  primary: 36,
+  secondary: 24,
+};
+export const sharedStyles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 20,
+    borderRadius: 10,
+    backgroundColor: "white",
+  },
+  textInput: {
+    fontSize: fonts.primary,
+    color: colors.card.fg,
+    textAlign: "center",
+  },
+  resetButton: { position: "absolute", top: 10, right: 10 },
+  resultButton: { position: "absolute", top: 10, left: 10 },
+  hintButton: { position: "absolute", bottom: 10, right: 10 },
+  penButton: { position: "absolute", bottom: 10, left: 10 },
+  quizButton: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

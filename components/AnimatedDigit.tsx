@@ -1,3 +1,4 @@
+import { colors, fonts } from "@/lib/styles";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
@@ -38,7 +39,9 @@ export default function AnimatedDigit({ digit, style }: AnimatedDigitProps) {
   });
 
   return (
-    <Animated.Text style={[styles.digit, style, animatedStyle]}>
+    <Animated.Text
+      style={[styles.defaultText, styles.digit, style, animatedStyle]}
+    >
       {digit}
     </Animated.Text>
   );
@@ -46,8 +49,11 @@ export default function AnimatedDigit({ digit, style }: AnimatedDigitProps) {
 
 const styles = StyleSheet.create({
   digit: {
-    fontSize: 26,
-    width: 30,
     textAlign: "right",
+  },
+  defaultText: {
+    fontSize: fonts.primary,
+    color: colors.card.fg,
+    fontFamily: "BlexMono",
   },
 });

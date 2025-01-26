@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
-import { colors, sharedStyles } from "@/lib/styles";
+import { colors, fonts, sharedStyles } from "@/lib/styles";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { divide, getRandomNumber } from "@/lib/utils";
@@ -18,6 +18,8 @@ import EvilIcons from "@expo/vector-icons/EvilIcons";
 import PenScratchPad from "@/components/PenScratchPad";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
 
 export default function Division() {
   const { id } = useLocalSearchParams();
@@ -29,6 +31,9 @@ export default function Division() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [penModalVisible, setPenModalVisible] = useState(false);
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   const openPenModal = () => {
     setPenModalVisible(true);
@@ -75,6 +80,10 @@ export default function Division() {
     }
   };
 
+  if (!loaded && !error) {
+    return null;
+  }
+
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
 
@@ -107,7 +116,7 @@ export default function Division() {
         style={{ ...sharedStyles.hintButton, marginRight: 5 }}
         onPress={openModal}
       >
-        <AntDesign name="questioncircle" size={40} color="#bec3c8" />
+        <AntDesign name="questioncircle" size={40} color={`${cardBgTint}`} />
       </TouchableOpacity>
 
       <View
@@ -118,14 +127,14 @@ export default function Division() {
           position: "absolute",
           left: 10,
           bottom: 10,
-          backgroundColor: "#bec3c8",
+          backgroundColor: cardBgTint,
         }}
       >
         <TouchableOpacity
           style={{ ...sharedStyles.penButton, marginLeft: 0 }}
           onPress={openPenModal}
         >
-          <EvilIcons name="pencil" size={24} color="#fff" />
+          <EvilIcons name="pencil" size={24} color={`${cardBg}`} />
         </TouchableOpacity>
       </View>
 
@@ -154,18 +163,22 @@ export default function Division() {
         <PenScratchPad />
       </Modal>
 
-      <Text style={{ fontSize: 44 }}>
+      <MText>
         {dividend} ÷ {divisor}
-      </Text>
+      </MText>
       <View
         style={{
           flexDirection: "row",
-          marginLeft: 30,
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 30,
+          marginTop: 60,
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 10 }}>Quotient = </Text>
+        <MText style={{ fontSize: fonts.secondary }}>Quotient = </MText>
         <TextInput
-          style={{ fontSize: 24, width: "75%" }}
+          style={sharedStyles.textInput}
+          placeholderTextColor={colors.card.fg}
           placeholder={"?"}
           value={userQuotient}
           keyboardType="numeric"
@@ -175,12 +188,15 @@ export default function Division() {
       <View
         style={{
           flexDirection: "row",
-          marginLeft: 30,
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 30,
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 10 }}>Reminder = </Text>
+        <MText style={{ fontSize: fonts.secondary }}>Reminder = </MText>
         <TextInput
-          style={{ fontSize: 24, width: "75%" }}
+          style={sharedStyles.textInput}
+          placeholderTextColor={colors.card.fg}
           placeholder={"?"}
           value={userReminder}
           keyboardType="numeric"

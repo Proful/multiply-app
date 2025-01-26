@@ -2,7 +2,6 @@ import { Text, View, TextInput, TouchableOpacity } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Fraction from "@/components/Fraction";
-import Svg, { Line } from "react-native-svg";
 import {
   compareFloat,
   getRandomNumberFrom,
@@ -13,6 +12,9 @@ import { colors, sharedStyles } from "@/lib/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
+import { FractionLine } from "@/components/FractionLine";
+import { useFonts } from "expo-font";
+import MText from "@/components/MText";
 
 export default function AddingFractions() {
   const { id } = useLocalSearchParams();
@@ -24,6 +26,9 @@ export default function AddingFractions() {
 
   const [numerator, setNumerator] = useState<string>("");
   const [denominator, setDenominator] = useState<string>("");
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   function setup() {
     const a = getRandomNumberFrom(4);
@@ -39,6 +44,37 @@ export default function AddingFractions() {
   }
 
   useFocusEffect(useCallback(setup, []));
+
+  function checkAnswer(text: string, type: string) {
+    let b = numerator,
+      c = denominator;
+
+    if (type === "NUMERATOR") {
+      b = text;
+      setNumerator(b);
+    } else if (type === "DENOMINATOR") {
+      c = text;
+      setDenominator(c);
+    }
+
+    if (c) {
+      setIsCommonDenominator(+c === lcm(firstNumber[2], secondNumber[2]));
+    }
+
+    if (b && c) {
+      const ans =
+        firstNumber[0] / firstNumber[1] + secondNumber[0] / secondNumber[1];
+      const isMatch = compareFloat(Number(b) / Number(c), ans);
+
+      setResult(isMatch ? "correct" : "wrong");
+    } else {
+      setResult("wrong");
+    }
+  }
+
+  if (!loaded && !error) {
+    return null;
+  }
 
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
@@ -68,74 +104,38 @@ export default function AddingFractions() {
       <View
         style={{
           flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
         }}
       >
         <Fraction numerator={firstNumber[0]} denominator={firstNumber[1]} />
-        <View>
-          <Text style={{ fontSize: 24, margin: 10, color: colors.card.fg }}>
-            +
-          </Text>
-        </View>
+        <MText>+</MText>
         <Fraction numerator={secondNumber[0]} denominator={secondNumber[1]} />
       </View>
 
       <View
         style={{
           flexDirection: "row",
+          alignItems: "center",
+          gap: 20,
         }}
       >
-        <Text style={{ fontSize: 24, marginTop: 42, color: colors.card.fg }}>
-          ={" "}
-        </Text>
+        <MText>=</MText>
         <View>
-          <View>
-            <TextInput
-              style={{ fontSize: 24, color: colors.card.fg }}
-              placeholder={"?"}
-              value={numerator}
-              onChangeText={(txt) => {
-                setNumerator(txt);
-
-                if (txt && Number(denominator) !== 0) {
-                  const ans =
-                    firstNumber[0] / firstNumber[1] +
-                    secondNumber[0] / secondNumber[1];
-                  if (compareFloat(Number(txt) / Number(denominator), ans)) {
-                    setResult("correct");
-                  } else {
-                    setResult("wrong");
-                  }
-                } else {
-                  setResult("wrong");
-                }
-              }}
-            />
-          </View>
-          <FractionLine />
           <TextInput
-            style={{ fontSize: 24, color: colors.card.fg }}
+            style={sharedStyles.textInput}
+            placeholderTextColor={colors.card.fg}
+            placeholder={"?"}
+            value={numerator}
+            onChangeText={(txt) => checkAnswer(txt, "NUMERATOR")}
+          />
+          <FractionLine w={150} />
+          <TextInput
+            style={sharedStyles.textInput}
+            placeholderTextColor={colors.card.fg}
             placeholder={"?"}
             value={denominator}
-            onChangeText={(txt) => {
-              setDenominator(txt);
-              if (txt) {
-                const ans =
-                  firstNumber[0] / firstNumber[1] +
-                  secondNumber[0] / secondNumber[1];
-                if (compareFloat(Number(numerator) / Number(txt), ans)) {
-                  setResult("correct");
-                } else {
-                  setResult("wrong");
-                }
-              } else {
-                setResult("wrong");
-              }
-              if (txt && Number(txt) === lcm(firstNumber[1], secondNumber[1])) {
-                setIsCommonDenominator(true);
-              } else {
-                setIsCommonDenominator(false);
-              }
-            }}
+            onChangeText={(txt) => checkAnswer(txt, "DENOMINATOR")}
           />
         </View>
       </View>
@@ -147,20 +147,3 @@ export default function AddingFractions() {
     </View>
   );
 }
-
-const FractionLine = () => {
-  return (
-    <View>
-      <Svg height="10" width="200">
-        <Line
-          x1="0"
-          y1="10"
-          x2="200"
-          y2="10"
-          stroke={colors.card.fg}
-          strokeWidth="2"
-        />
-      </Svg>
-    </View>
-  );
-};
