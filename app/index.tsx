@@ -33,12 +33,15 @@ export default function Index() {
     >
       <View
         style={{
-          flexWrap: "wrap",
-          flexGrow: 1,
           width: "75%",
         }}
       >
-        <Text style={styles.title}>{item.title}</Text>
+        <Text
+          style={[styles.title, { flexWrap: "wrap", width: "100%" }]}
+          numberOfLines={2}
+        >
+          {item.title}
+        </Text>
         <View style={{ marginBottom: 10 }} />
         <Text
           style={[styles.description, { flexWrap: "wrap", width: "100%" }]}

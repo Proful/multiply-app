@@ -1,10 +1,7 @@
-import { colors, fonts, sharedStyles } from "@/lib/styles";
-import { Ionicons } from "@expo/vector-icons";
+import { colors, sharedStyles } from "@/lib/styles";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import Svg, { Line } from "react-native-svg";
-import ConfettiCannon from "react-native-confetti-cannon";
+import { View } from "react-native";
 import { darkenColor, getRandomNumber } from "@/lib/utils";
 import FiveDigitInput from "@/components/FiveDigitInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,6 +9,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
 import { FractionLine } from "@/components/FractionLine";
+import ResetButton from "@/components/ResetButton";
+import ResultButton from "@/components/ResultButton";
 
 const STORAGE_KEY = "multiplication";
 export default function Multiplication() {
@@ -83,19 +82,9 @@ export default function Multiplication() {
           },
         ]}
       >
-        <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-          <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
-        </TouchableOpacity>
-        {result === "correct" && (
-          <View style={sharedStyles.resultButton}>
-            <Ionicons name="checkmark-circle-outline" size={50} color="green" />
-          </View>
-        )}
-        {result === "wrong" && (
-          <View style={sharedStyles.resultButton}>
-            <Ionicons name="close-circle-outline" size={50} color="red" />
-          </View>
-        )}
+        <ResetButton onReset={setup} />
+        <ResultButton result={result} />
+
         <View style={{ alignItems: "center" }}>
           <MText>{firstNumber}</MText>
 
@@ -111,33 +100,8 @@ export default function Multiplication() {
           <FiveDigitInput seed={seed} />
           <FractionLine w={250} />
           <FiveDigitInput onDigit={checkAnswer} seed={seed} />
-
-          {result === "correct" && (
-            <ConfettiCannon
-              count={200} // Number of particles
-              origin={{ x: 200, y: 0 }} // Origin of the confetti (top-center)
-              autoStart={true} // Automatically trigger confetti
-              fadeOut={true} // Confetti fades out
-              explosionSpeed={350} // Speed of the particles
-            />
-          )}
         </View>
       </View>
     </>
   );
 }
-
-const Divider = () => (
-  <View>
-    <Svg height="10" width="250">
-      <Line
-        x1="0"
-        y1="10"
-        x2="250"
-        y2="10"
-        stroke={colors.card.fg}
-        strokeWidth="2"
-      />
-    </Svg>
-  </View>
-);

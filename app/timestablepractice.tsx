@@ -1,8 +1,7 @@
-import { colors, fonts, sharedStyles } from "@/lib/styles";
+import { colors, sharedStyles } from "@/lib/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native";
-
+import { View } from "react-native";
 import { useFonts } from "expo-font";
 import { useLocalSearchParams } from "expo-router";
 import MText from "@/components/MText";

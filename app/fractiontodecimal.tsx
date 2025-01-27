@@ -1,15 +1,15 @@
-import { Text, View, TextInput, TouchableOpacity } from "react-native";
+import { View, TextInput } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Fraction from "@/components/Fraction";
-import { colors, fonts, sharedStyles } from "@/lib/styles";
-import { Ionicons } from "@expo/vector-icons";
-import ConfettiCannon from "react-native-confetti-cannon";
+import { colors, sharedStyles } from "@/lib/styles";
 import { getRandomNumber, getRandomNumberFromArray } from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
+import ResetButton from "@/components/ResetButton";
+import ResultButton from "@/components/ResultButton";
 
 export default function FractionToDecimal() {
   const { id } = useLocalSearchParams();
@@ -59,19 +59,9 @@ export default function FractionToDecimal() {
         },
       ]}
     >
-      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
-      </TouchableOpacity>
-      {result === "correct" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
-        </View>
-      )}
-      {result === "wrong" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="close-circle-outline" size={50} color="red" />
-        </View>
-      )}
+      <ResetButton onReset={setup} />
+      <ResultButton result={result} />
+
       <View
         style={{
           flexDirection: "row",
@@ -92,15 +82,6 @@ export default function FractionToDecimal() {
           onChangeText={checkAnswer}
         />
       </View>
-      {result === "correct" && (
-        <ConfettiCannon
-          count={200} // Number of particles
-          origin={{ x: 200, y: 0 }} // Origin of the confetti (top-center)
-          autoStart={true} // Automatically trigger confetti
-          fadeOut={true} // Confetti fades out
-          explosionSpeed={350} // Speed of the particles
-        />
-      )}
     </View>
   );
 }

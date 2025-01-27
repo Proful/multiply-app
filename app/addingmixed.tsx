@@ -16,7 +16,7 @@ import {
   MixedNumberType,
 } from "@/lib/utils";
 import { colors, sharedStyles } from "@/lib/styles";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import MixedNumber from "@/components/MixedNumber";
 import HintModal from "@/components/HintModal";
 import { useLocalSearchParams } from "expo-router";
@@ -24,6 +24,8 @@ import { darkenColor } from "@/lib/utils";
 import { FractionLine } from "@/components/FractionLine";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
+import ResetButton from "@/components/ResetButton";
+import ResultButton from "@/components/ResultButton";
 
 export default function AddingMixed() {
   const { id } = useLocalSearchParams();
@@ -120,19 +122,8 @@ export default function AddingMixed() {
         },
       ]}
     >
-      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
-      </TouchableOpacity>
-      {result === "correct" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
-        </View>
-      )}
-      {result === "wrong" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="close-circle-outline" size={50} color="red" />
-        </View>
-      )}
+      <ResetButton onReset={setup} />
+      <ResultButton result={result} />
 
       <TouchableOpacity
         style={{ ...sharedStyles.hintButton, marginRight: 5 }}

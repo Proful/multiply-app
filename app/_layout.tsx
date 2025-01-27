@@ -1,5 +1,3 @@
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Drawer } from "expo-router/drawer";
 import { Stack } from "expo-router/stack";
 import { router } from "expo-router";
 import { TouchableOpacity } from "react-native";

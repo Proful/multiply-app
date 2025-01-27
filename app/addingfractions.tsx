@@ -1,4 +1,4 @@
-import { Text, View, TextInput, TouchableOpacity } from "react-native";
+import { Text, View, TextInput } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import Fraction from "@/components/Fraction";
@@ -9,12 +9,12 @@ import {
   lcm,
 } from "@/lib/utils";
 import { colors, sharedStyles } from "@/lib/styles";
-import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import { darkenColor } from "@/lib/utils";
 import { FractionLine } from "@/components/FractionLine";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
+import ResetButton from "@/components/ResetButton";
+import ResultButton from "@/components/ResultButton";
 
 export default function AddingFractions() {
   const { id } = useLocalSearchParams();
@@ -77,7 +77,6 @@ export default function AddingFractions() {
   }
 
   const cardBg = colors.card[+(id as string) % 10];
-  const cardBgTint = darkenColor("#ffffff", 0.5);
 
   return (
     <View
@@ -88,19 +87,9 @@ export default function AddingFractions() {
         },
       ]}
     >
-      <TouchableOpacity style={sharedStyles.resetButton} onPress={setup}>
-        <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
-      </TouchableOpacity>
-      {result === "correct" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="checkmark-circle-outline" size={50} color="green" />
-        </View>
-      )}
-      {result === "wrong" && (
-        <View style={sharedStyles.resultButton}>
-          <Ionicons name="close-circle-outline" size={50} color="red" />
-        </View>
-      )}
+      <ResetButton onReset={setup} />
+      <ResultButton result={result} />
+
       <View
         style={{
           flexDirection: "row",

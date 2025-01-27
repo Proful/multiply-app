@@ -4,13 +4,13 @@ import { useState, useCallback, useEffect } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors, sharedStyles } from "@/lib/styles";
-import { Ionicons } from "@expo/vector-icons";
 import { darkenColor, getRandomNumber } from "@/lib/utils";
 import AnimatedDigit from "@/components/AnimatedDigit";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
+import ResetButton from "@/components/ResetButton";
 const STORAGE_KEY = "timestable";
 const FROM_VALUE = 2;
 const TO_VALUE = 10;
@@ -84,6 +84,10 @@ export default function TimesTable() {
     return null;
   }
 
+  const setup = () => {
+    setDigit(getRandomNumber(fromValue, toValue));
+  };
+
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
 
@@ -97,14 +101,8 @@ export default function TimesTable() {
       ]}
     >
       <>
-        <TouchableOpacity
-          style={sharedStyles.resetButton}
-          onPress={() => {
-            setDigit(getRandomNumber(fromValue, toValue));
-          }}
-        >
-          <Ionicons name="refresh-circle" size={50} color={`${cardBgTint}`} />
-        </TouchableOpacity>
+        <ResetButton onReset={setup} />
+
         <TouchableOpacity
           style={[sharedStyles.quizButton, { backgroundColor: cardBgTint }]}
           onPress={() => {
