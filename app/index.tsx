@@ -121,7 +121,8 @@ const data = [
     img: require("../assets/images/timestable.png"),
   }, // Green
   {
-    route: "/multiplication",
+    // route: "/multiplication",
+    route: "/mul",
     title: "Multiplication",
     description: "Master the art of multiplication.",
     color: "#FF5722",
