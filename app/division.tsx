@@ -20,9 +20,11 @@ import { useFonts } from "expo-font";
 import MText from "@/components/MText";
 import ResetButton from "@/components/ResetButton";
 import ResultButton from "@/components/ResultButton";
+import FiveDigitInput from "@/components/FiveDigitInput";
 
 export default function Division() {
   const { id } = useLocalSearchParams();
+  const [seed, setSeed] = useState<number>(0);
   const [dividend, setDividend] = useState<number>(0);
   const [divisor, setDivisor] = useState<number>(0);
   const [userQuotient, setUserQuotient] = useState<string>("");
@@ -50,6 +52,7 @@ export default function Division() {
     const b = getRandomNumber(2, 9);
     setDividend(a);
     setDivisor(b);
+    setSeed(getRandomNumber(10, 999999));
     setUserQuotient("");
     setUserReminder("");
     setResult("");
@@ -155,39 +158,31 @@ export default function Division() {
       </MText>
       <View
         style={{
-          flexDirection: "row",
+          justifyContent: "center",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: 30,
           marginTop: 60,
         }}
       >
-        <MText style={{ fontSize: fonts.secondary }}>Quotient = </MText>
-        <TextInput
-          style={sharedStyles.textInput}
-          placeholderTextColor={colors.card.fg}
-          placeholder={"?"}
-          value={userQuotient}
-          keyboardType="numeric"
-          onChangeText={(txt) => checkAnswer(txt, "QUOTIENT")}
+        <MText style={{ fontSize: fonts.secondary }}>Quotient</MText>
+        <FiveDigitInput
+          numOfDigits={4}
+          seed={seed}
+          direction="L2R"
+          onDigit={(txt) => checkAnswer(txt + "", "QUOTIENT")}
         />
       </View>
       <View
         style={{
-          flexDirection: "row",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: 30,
+          justifyContent: "center",
         }}
       >
-        <MText style={{ fontSize: fonts.secondary }}>Reminder = </MText>
-        <TextInput
-          style={sharedStyles.textInput}
-          placeholderTextColor={colors.card.fg}
-          placeholder={"?"}
-          value={userReminder}
-          keyboardType="numeric"
-          onChangeText={(txt) => checkAnswer(txt, "REMAINDER")}
+        <MText style={{ fontSize: fonts.secondary }}>Reminder</MText>
+        <FiveDigitInput
+          numOfDigits={3}
+          seed={seed}
+          direction="L2R"
+          onDigit={(txt) => checkAnswer(txt + "", "REMAINDER")}
         />
       </View>
     </View>

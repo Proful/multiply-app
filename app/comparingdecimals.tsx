@@ -3,7 +3,7 @@ import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import RadioInput from "@/components/RadioInput";
 import { colors, sharedStyles } from "@/lib/styles";
-import { getRandomNumber, leftPad } from "@/lib/utils";
+import { getRandomNumber, leftPad, rightPad } from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
 import { useFonts } from "expo-font";
@@ -23,9 +23,10 @@ export default function ComparingDecimals() {
 
   const handleRadioValueChange = (value: string) => {
     setSelectedOption(value);
-    if (value === ">") {
+
+    if (value === "Greater than (>)") {
       setResult(firstNumber > secondNumber ? "correct" : "wrong");
-    } else if (value === "<") {
+    } else if (value === "Less than (<)") {
       setResult(firstNumber < secondNumber ? "correct" : "wrong");
     } else {
       setResult(firstNumber === secondNumber ? "correct" : "wrong");
@@ -34,8 +35,8 @@ export default function ComparingDecimals() {
 
   const setup = () => {
     const tmp = getRandomNumber(1, 99);
-    const a = Number(tmp + "." + leftPad(getRandomNumber(1, 999), 3));
-    const b = Number(tmp + "." + leftPad(getRandomNumber(1, 999), 3));
+    const a = Number(tmp + "." + getRandomNumber(100, 999));
+    const b = Number(tmp + "." + getRandomNumber(100, 999));
     setFirstNumber(a);
     setSecondNumber(b);
     setResult("");
@@ -45,11 +46,13 @@ export default function ComparingDecimals() {
   useFocusEffect(useCallback(setup, []));
 
   const cardBg = colors.card[+(id as string) % 10];
-  const cardBgTint = darkenColor("#ffffff", 0.5);
 
   if (!loaded && !error) {
     return null;
   }
+
+  const x = rightPad(firstNumber, 5);
+  const y = rightPad(secondNumber, 5);
 
   return (
     <>
@@ -63,19 +66,18 @@ export default function ComparingDecimals() {
       >
         <ResetButton onReset={setup} />
         <ResultButton result={result} />
-
         <View
           style={{
             flexDirection: "row",
           }}
         >
           <MText>
-            {firstNumber} ? {secondNumber}
+            {x} ? {y}
           </MText>
         </View>
 
         <RadioInput
-          options={[">", "<", "="]}
+          options={["Greater than (>)", "Less than (<)", "Equal to (=)"]}
           value={selectedOption}
           onValueChange={handleRadioValueChange}
         />

@@ -47,9 +47,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 30,
   },
   radioButton: {
     flexDirection: "row",

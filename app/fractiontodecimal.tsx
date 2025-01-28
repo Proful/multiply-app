@@ -10,13 +10,14 @@ import { useFonts } from "expo-font";
 import MText from "@/components/MText";
 import ResetButton from "@/components/ResetButton";
 import ResultButton from "@/components/ResultButton";
+import FiveDigitInput from "@/components/FiveDigitInput";
 
 export default function FractionToDecimal() {
   const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
-  const [userAnswer, setUserAnswer] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [seed, setSeed] = useState<number>(0);
   const [loaded, error] = useFonts({
     BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
   });
@@ -26,25 +27,21 @@ export default function FractionToDecimal() {
     const b = getRandomNumber(1, a - 1);
     setFirstNumber(b);
     setSecondNumber(a);
-    setUserAnswer("");
     setResult("");
+    setSeed(getRandomNumber(10, 999999));
   };
 
   useFocusEffect(useCallback(setup, []));
 
-  const checkAnswer = (txt: string) => {
-    setUserAnswer(txt);
-    if (txt) {
-      if (Number(txt) === firstNumber / secondNumber) {
-        setResult("correct");
-      } else {
-        setResult("wrong");
-      }
+  const checkAnswer = (txt: number) => {
+    if (txt === firstNumber / secondNumber) {
+      setResult("correct");
+    } else {
+      setResult("wrong");
     }
   };
 
   const cardBg = colors.card[+(id as string) % 10];
-  const cardBgTint = darkenColor("#ffffff", 0.5);
 
   if (!loaded && !error) {
     return null;
@@ -64,22 +61,18 @@ export default function FractionToDecimal() {
 
       <View
         style={{
-          flexDirection: "row",
           marginHorizontal: 30,
-          gap: 15,
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         <Fraction numerator={firstNumber} denominator={secondNumber} />
         <MText>=</MText>
-        <TextInput
-          style={sharedStyles.textInput}
-          placeholderTextColor={colors.card.fg}
-          placeholder={"?"}
-          keyboardType="numeric"
-          value={userAnswer}
-          onChangeText={checkAnswer}
+        <FiveDigitInput
+          numOfDigits={4}
+          seed={seed}
+          direction="L2R"
+          onDigit={checkAnswer}
         />
       </View>
     </View>

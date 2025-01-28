@@ -5,6 +5,7 @@ import Fraction from "@/components/Fraction";
 import Svg, { Line } from "react-native-svg";
 import {
   compareFloat,
+  getRandomNumber,
   getRandomNumberFrom,
   getRandomNumberTill,
   lcm,
@@ -17,6 +18,7 @@ import { darkenColor } from "@/lib/utils";
 import { FractionLine } from "@/components/FractionLine";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
+import FiveDigitInput from "@/components/FiveDigitInput";
 
 export default function SubtractingFractions() {
   const { id } = useLocalSearchParams();
@@ -26,6 +28,7 @@ export default function SubtractingFractions() {
   const [result, setResult] = useState<string>("");
   const [isCommonDenominator, setIsCommonDenominator] =
     useState<boolean>(false);
+  const [seed, setSeed] = useState<number>(0);
 
   const [numerator, setNumerator] = useState<string>("");
   const [denominator, setDenominator] = useState<string>("");
@@ -52,6 +55,7 @@ export default function SubtractingFractions() {
     setIsCommonDenominator(false);
     setNumerator("");
     setDenominator("");
+    setSeed(getRandomNumber(10, 999999));
   }
 
   useFocusEffect(useCallback(setup, []));
@@ -132,25 +136,24 @@ export default function SubtractingFractions() {
       >
         <MText>=</MText>
         <View>
-          <TextInput
-            style={sharedStyles.textInput}
-            placeholderTextColor={colors.card.fg}
-            placeholder={"?"}
-            value={numerator}
-            onChangeText={(txt) => checkAnswer(txt, "NUMERATOR")}
+          <FiveDigitInput
+            numOfDigits={2}
+            seed={seed}
+            direction="L2R"
+            onDigit={(txt) => checkAnswer(txt + "", "NUMERATOR")}
           />
 
-          <FractionLine w={200} />
+          <FractionLine w={150} />
 
-          <TextInput
-            style={sharedStyles.textInput}
-            placeholderTextColor={colors.card.fg}
-            placeholder={"?"}
-            value={denominator}
-            onChangeText={(txt) => checkAnswer(txt, "DENOMINATOR")}
+          <FiveDigitInput
+            numOfDigits={2}
+            seed={seed}
+            direction="L2R"
+            onDigit={(txt) => checkAnswer(txt + "", "DENOMINATOR")}
           />
         </View>
       </View>
+
       {result === "correct" && (
         <ConfettiCannon
           count={200} // Number of particles

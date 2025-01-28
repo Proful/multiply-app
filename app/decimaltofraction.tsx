@@ -3,12 +3,17 @@ import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import { colors, sharedStyles } from "@/lib/styles";
 import { useLocalSearchParams } from "expo-router";
-import { darkenColor, getRandomNumberFromArray } from "@/lib/utils";
+import {
+  darkenColor,
+  getRandomNumber,
+  getRandomNumberFromArray,
+} from "@/lib/utils";
 import { useFonts } from "expo-font";
 import MText from "@/components/MText";
 import { FractionLine } from "@/components/FractionLine";
 import ResetButton from "@/components/ResetButton";
 import ResultButton from "@/components/ResultButton";
+import FiveDigitInput from "@/components/FiveDigitInput";
 
 export default function DecimalToFraction() {
   const { id } = useLocalSearchParams();
@@ -16,6 +21,7 @@ export default function DecimalToFraction() {
   const [numerator, setNumerator] = useState<string>("");
   const [denominator, setDenominator] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [seed, setSeed] = useState<number>(0);
   const [loaded, error] = useFonts({
     BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
   });
@@ -26,6 +32,7 @@ export default function DecimalToFraction() {
     setNumerator("");
     setDenominator("");
     setResult("");
+    setSeed(getRandomNumber(10, 999999));
   };
 
   useFocusEffect(useCallback(setup, []));
@@ -84,22 +91,20 @@ export default function DecimalToFraction() {
         <MText>{firstNumber}</MText>
         <MText>=</MText>
         <View>
-          <TextInput
-            style={sharedStyles.textInput}
-            placeholderTextColor={colors.card.fg}
-            placeholder={"?"}
-            value={numerator}
-            onChangeText={(txt) => checkAnswer(txt, "NUMERATOR")}
+          <FiveDigitInput
+            numOfDigits={2}
+            seed={seed}
+            direction="L2R"
+            onDigit={(txt) => checkAnswer(txt + "", "NUMERATOR")}
           />
 
-          <FractionLine w={50} />
+          <FractionLine w={150} />
 
-          <TextInput
-            style={sharedStyles.textInput}
-            placeholderTextColor={colors.card.fg}
-            placeholder={"?"}
-            value={denominator}
-            onChangeText={(txt) => checkAnswer(txt, "DENOMINATOR")}
+          <FiveDigitInput
+            numOfDigits={2}
+            seed={seed}
+            direction="L2R"
+            onDigit={(txt) => checkAnswer(txt + "", "DENOMINATOR")}
           />
         </View>
       </View>
