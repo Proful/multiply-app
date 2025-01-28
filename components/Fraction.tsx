@@ -1,7 +1,6 @@
 import { colors, fonts } from "@/lib/styles";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import Svg, { Line } from "react-native-svg";
+import { View, StyleSheet } from "react-native";
 import MText from "./MText";
 import { FractionLine } from "./FractionLine";
 interface FractionProps {

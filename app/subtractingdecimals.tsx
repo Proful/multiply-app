@@ -2,7 +2,11 @@ import { View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import { colors, sharedStyles } from "@/lib/styles";
-import { compareFloatWithDifference, getRandomNumber } from "@/lib/utils";
+import {
+  compareFloatWithDifference,
+  getRandomNumber,
+  rightPad,
+} from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
 import { darkenColor } from "@/lib/utils";
 import { useFonts } from "expo-font";
@@ -52,7 +56,8 @@ export default function SubtractingDecimals() {
   };
 
   const cardBg = colors.card[+(id as string) % 10];
-  const cardBgTint = darkenColor("#ffffff", 0.5);
+  const x = rightPad(firstNumber, 5);
+  const y = rightPad(secondNumber, 5);
 
   return (
     <View
@@ -67,10 +72,10 @@ export default function SubtractingDecimals() {
       <ResultButton result={result} />
 
       <View style={{ alignItems: "center" }}>
-        <MText>{firstNumber}</MText>
+        <MText>{x}</MText>
 
         <View>
-          <MText>{secondNumber}</MText>
+          <MText>{y}</MText>
           <MText style={{ position: "absolute", top: 0, left: -40 }}>
             {"-"}
           </MText>

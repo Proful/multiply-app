@@ -1,4 +1,4 @@
-import { colors, sharedStyles } from "@/lib/styles";
+import { colors, fonts, sharedStyles } from "@/lib/styles";
 import { useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
 import { View } from "react-native";
@@ -66,7 +66,6 @@ export default function Multiplication() {
   };
 
   const cardBg = colors.card[+(id as string) % 10];
-  const cardBgTint = darkenColor("#ffffff", 0.5);
 
   if (!loaded && !error) {
     return null;
@@ -86,10 +85,12 @@ export default function Multiplication() {
         <ResultButton result={result} />
 
         <View style={{ alignItems: "center" }}>
-          <MText>{firstNumber}</MText>
+          <MText style={{ letterSpacing: fonts.primary }}>{firstNumber}</MText>
 
           <View>
-            <MText>{secondNumber}</MText>
+            <MText style={{ letterSpacing: fonts.primary }}>
+              {secondNumber}
+            </MText>
             <MText style={{ position: "absolute", top: 0, left: -40 }}>
               {"X"}
             </MText>
@@ -97,7 +98,7 @@ export default function Multiplication() {
 
           <FractionLine w={250} />
           <FiveDigitInput seed={seed} />
-          <FiveDigitInput seed={seed} />
+          <FiveDigitInput seed={seed} disabledIndex={4} />
           <FractionLine w={250} />
           <FiveDigitInput onDigit={checkAnswer} seed={seed} />
         </View>

@@ -45,22 +45,7 @@ export default function Layout() {
       />
       <Stack.Screen
         name="multiplication"
-        options={{
-          title: "Multiplication",
-
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => router.push("/multiplication_settings")}
-              style={{
-                marginRight: 10,
-                zIndex: 9,
-              }}
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            >
-              <Ionicons name="settings-outline" size={24} color="black" />
-            </TouchableOpacity>
-          ),
-        }}
+        options={{ title: "Multiplication" }}
       />
       <Stack.Screen
         name="multiplication_settings"

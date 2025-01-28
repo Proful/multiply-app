@@ -28,6 +28,7 @@
     "expo-dev-client": "~5.0.6",
     "expo-font": "~13.0.1",
     "expo-haptics": "~14.0.0",
+    "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.3",
     "expo-router": "~4.0.11",
     "expo-splash-screen": "~0.29.18",
@@ -35,6 +36,7 @@
     "expo-symbols": "~0.2.0",
     "expo-system-ui": "~4.0.6",
     "expo-web-browser": "~14.0.1",
+    "moti": "^0.29.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.5",
@@ -47,8 +49,7 @@
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "rn-perfect-sketch-canvas": "^0.3.0",
-    "expo-linear-gradient": "~14.0.2"
+    "rn-perfect-sketch-canvas": "^0.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -104,6 +104,21 @@ export default function TimesTable() {
         <ResetButton onReset={setup} />
 
         <TouchableOpacity
+          style={{ ...sharedStyles.hintButton, marginRight: 5 }}
+          onPress={() => {
+            router.navigate(
+              `/timestablepractice?id=5&fromValue=${fromValue}&toValue=${toValue}`,
+            );
+          }}
+        >
+          <AntDesign
+            name="questioncircle"
+            size={40}
+            color="rgba(255,255,255,0.5)"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={[sharedStyles.quizButton, { backgroundColor: cardBgTint }]}
           onPress={() => {
             router.navigate("/quiz/timestable");

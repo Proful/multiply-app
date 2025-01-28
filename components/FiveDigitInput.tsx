@@ -4,10 +4,15 @@ import { TextInput, View, StyleSheet } from "react-native";
 
 interface FiveDigitInputProps {
   seed: number;
+  disabledIndex?: number;
   onDigit?: (digit: number) => void;
 }
 
-const FiveDigitInput = ({ seed, onDigit }: FiveDigitInputProps) => {
+const FiveDigitInput = ({
+  seed,
+  disabledIndex,
+  onDigit,
+}: FiveDigitInputProps) => {
   const [digits, setDigits] = useState(["", "", "", "", ""]);
   const inputs = useRef<TextInput[]>([]);
 
@@ -31,19 +36,12 @@ const FiveDigitInput = ({ seed, onDigit }: FiveDigitInputProps) => {
       // Move to the prev input if available
       inputs.current[index - 1]?.focus();
     }
-    // if (text && index < 4) {
-    //   // Move to the next input if available
-    //   inputs.current[index + 1]?.focus();
-    // }
   };
 
   const handleKeyPress = (event: any, index: number) => {
     if (event.nativeEvent.key === "Backspace" && !digits[index] && index < 0) {
       inputs.current[index + 1]?.focus();
     }
-    // if (event.nativeEvent.key === "Backspace" && !digits[index] && index > 0) {
-    //   inputs.current[index - 1]?.focus();
-    // }
   };
 
   return (
@@ -56,7 +54,16 @@ const FiveDigitInput = ({ seed, onDigit }: FiveDigitInputProps) => {
           onKeyPress={(event) => handleKeyPress(event, index)}
           keyboardType="number-pad"
           maxLength={1}
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              borderColor:
+                disabledIndex !== index
+                  ? "rgba(255,255,255,0.5)"
+                  : "rgba(255,255,255,0.2)",
+            },
+          ]}
+          editable={disabledIndex !== index}
           ref={(ref) => {
             if (ref) inputs.current[index] = ref;
           }}
@@ -75,7 +82,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
     textAlign: "center",
     fontSize: fonts.secondary,
     marginHorizontal: 4,

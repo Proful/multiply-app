@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Image,
+  ImageSourcePropType,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { colors } from "@/lib/styles";
@@ -17,7 +19,12 @@ export default function Index() {
     item,
     index,
   }: {
-    item: { route: string; title: string; description: string };
+    item: {
+      route: string;
+      title: string;
+      description: string;
+      img?: ImageSourcePropType;
+    };
     index: number;
   }) => (
     <TouchableOpacity
@@ -33,7 +40,7 @@ export default function Index() {
     >
       <View
         style={{
-          width: "75%",
+          width: "65%",
         }}
       >
         <Text
@@ -51,15 +58,14 @@ export default function Index() {
           {item.description}
         </Text>
       </View>
-      <View
-        style={{
-          borderColor: colors.card.fg,
-          borderWidth: 1,
-          borderRadius: 5,
-          padding: 18,
-        }}
-      >
-        <AntDesign name="checkcircle" size={24} color="#02cc03" />
+
+      <View>
+        {item.img && (
+          <Image source={item.img} style={{ width: 90, height: 90 }} />
+        )}
+        {!item.img && (
+          <AntDesign name="checkcircle" size={24} color="#02cc03" />
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -112,89 +118,97 @@ const data = [
     title: "Times Table",
     description: "Learn and practice multiplication tables.",
     color: "#4CAF50",
+    img: require("../assets/images/timestable.png"),
   }, // Green
-  {
-    route: "/timestablepractice",
-    title: "Times Table Practice",
-    description: "Test your skills with times table exercises.",
-    color: "#2196F3",
-  }, // Blue
   {
     route: "/multiplication",
     title: "Multiplication",
     description: "Master the art of multiplication.",
     color: "#FF5722",
+    img: require("../assets/images/multiplication.png"),
   }, // Deep Orange
   {
     route: "/comparingdecimals",
     title: "Comparing Decimals",
     description: "Understand how to compare decimal numbers.",
     color: "#9C27B0",
+    img: require("../assets/images/comparing.png"),
   }, // Purple
   {
     route: "/fractiontodecimal",
     title: "Fraction To Decimal",
     description: "Convert fractions to decimals easily.",
     color: "#FF9800",
+    img: require("../assets/images/fraction2decimal.png"),
   }, // Orange
   {
     route: "/decimaltofraction",
     title: "Decimal To Fraction",
     description: "Learn how to convert decimals into fractions.",
     color: "#673AB7",
+    img: require("../assets/images/decimal2fraction.png"),
   }, // Deep Purple
   {
     route: "/addingdecimals",
     title: "Adding Decimals",
     description: "Practice addition with decimal numbers.",
     color: "#03A9F4",
+    img: require("../assets/images/addingdecimal.png"),
   }, // Light Blue
   {
     route: "/subtractingdecimals",
     title: "Subtracting Decimals",
     description: "Learn subtraction with decimals.",
     color: "#E91E63",
+    img: require("../assets/images/subtractingdecimal.png"),
   }, // Pink
   {
     route: "/addingfractions",
     title: "Adding Fractions",
     description: "Add fractions with ease and precision.",
     color: "#009688",
+    img: require("../assets/images/addingfraction.png"),
   }, // Teal
   {
     route: "/subtractingfractions",
     title: "Subtracting Fractions",
     description: "Master subtracting fractions step by step.",
     color: "#F44336",
+    img: require("../assets/images/subfraction.png"),
   }, // Red
   {
     route: "/threefractions",
     title: "Three Fractions",
     description: "Work with three fractions simultaneously.",
     color: "#795548",
+    img: require("../assets/images/threefraction.png"),
   }, // Brown
   {
     route: "/lcm",
     title: "LCM",
     description: "Find the least common multiple (LCM) of numbers.",
     color: "#FFC107",
+    img: require("../assets/images/lcm.png"),
   }, // Amber
   {
     route: "/addingmixed",
     title: "Adding Mixed Fractions",
     description: "Learn to add mixed fractions effectively.",
     color: "#607D8B",
+    img: require("../assets/images/addingmixed.png"),
   }, // Blue Gray
   {
     route: "/subtractingmixed",
     title: "Subtracting Mixed Fractions",
     description: "Master subtraction of mixed fractions.",
     color: "#8BC34A",
+    img: require("../assets/images/submixed.png"),
   }, // Light Green
   {
     route: "/division",
     title: "Division",
     description: "Sharpen your division skills.",
     color: "#FFEB3B",
+    img: require("../assets/images/division.png"),
   }, // Yellow
 ];

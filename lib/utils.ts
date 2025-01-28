@@ -41,6 +41,9 @@ export function getRandomNumberFromArray(arr: number[]) {
 export function leftPad(num: number, targetLength: number): string {
   return num.toString().padStart(targetLength, "0");
 }
+export function rightPad(num: number, targetLength: number): string {
+  return num.toString().padEnd(targetLength, "0");
+}
 export function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
