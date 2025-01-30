@@ -1,173 +1,95 @@
-import React, { useEffect } from "react";
-import { View } from "react-native";
-import Animated, {
-  useSharedValue,
-  withDelay,
-  withTiming,
-  withSequence,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import MText from "@/components/MText";
+import React, { useState, useEffect } from "react";
+import { useFonts } from "expo-font";
+import { View, Text, Button } from "react-native";
+const data = require("./mul.json");
+// console.log(data);
 
 type Props = {
   x: number;
   y: number;
 };
 
-const STEP_DELAY = 2000;
-
-const AnimatedDigit = ({
-  digit,
-  appearDelay,
-  disappearDelay = 0,
-  shouldFade = false,
-}: {
-  digit: string;
-  appearDelay: number;
-  disappearDelay?: number;
-  shouldFade?: boolean;
-}) => {
-  const opacity = useSharedValue(0);
-
-  useEffect(() => {
-    if (shouldFade) {
-      opacity.value = withDelay(
-        appearDelay,
-        withSequence(
-          withTiming(1, { duration: 300 }),
-          withDelay(disappearDelay - 300, withTiming(0, { duration: 300 })),
-        ),
-      );
-    } else {
-      opacity.value = withDelay(appearDelay, withTiming(1, { duration: 300 }));
-    }
-  }, []);
-
-  return (
-    <Animated.Text
-      style={[
-        { fontFamily: "monospace" },
-        useAnimatedStyle(() => ({ opacity: opacity.value })),
-      ]}
-    >
-      {digit}
-    </Animated.Text>
-  );
-};
-
 const MultiplicationExplainer: React.FC<Props> = ({ x = 25, y = 34 }) => {
-  // Split numbers into digits
-  const [x1, x2] = String(x).padStart(2, "0").split("").map(Number);
-  const [y1, y2] = String(y).padStart(2, "0").split("").map(Number);
-
-  // Calculate first row (multiplying by y2)
-  const firstDigitProduct = x2 * y2; // 5 × 4 = 20
-  const carry1 = Math.floor(firstDigitProduct / 10); // carry 2
-  const firstDigitResult = firstDigitProduct % 10; // write 0
-
-  const secondDigitProduct = x1 * y2 + carry1; // (2 × 4) + 2 = 10
-
-  // First row will show complete number 100
-  const firstRowResult = y2 * x; // 4 × 25 = 100
-  const firstRowDigits = String(firstRowResult).padStart(3, " ").split("");
-
-  // Calculate second row (multiplying by y1)
-  const secondRowProduct = y1 * x; // 3 × 25 = 75
-  const secondRowDigits = String(secondRowProduct).padStart(2, " ").split("");
-
-  const lines = {
-    first: useSharedValue(0),
-    second: useSharedValue(0),
-  };
+  const [step1, setStep1] = useState(["", "", "", "", ""]);
+  const [step2, setStep2] = useState(["", "", "", "", ""]);
+  const [loaded, error] = useFonts({
+    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
+  });
 
   useEffect(() => {
-    lines.first.value = withDelay(0, withTiming(1, { duration: 300 }));
-    lines.second.value = withDelay(
-      8 * STEP_DELAY,
-      withTiming(1, { duration: 300 }),
-    );
-  }, []);
+    let currentData = [...data]; // Create a copy of the data array
+    let currentStep1 = [...step1]; // Create a copy of the step1 array
+    let currentStep2 = [...step2]; // Create a copy of the step1 array
 
+    const interval = setInterval(() => {
+      if (currentData.length > 0) {
+        // Pop the first element from the data array
+        const poppedElement = currentData.shift()!;
+
+        if (poppedElement.shift === 0) {
+          // Update the step1 array from right to left
+          const newStep1 = [...currentStep1];
+          for (let i = newStep1.length - 1; i >= 0; i--) {
+            if (newStep1[i] === undefined || newStep1[i] === "") {
+              newStep1[i] = poppedElement.writeDown;
+              break;
+            }
+          }
+          // Update the state
+          setStep1(newStep1);
+          currentStep1 = [...newStep1];
+        }
+
+        if (poppedElement.shift === 1) {
+          // Update the step2 array from right to left
+          const newStep2 = [...currentStep2];
+          for (let i = newStep2.length - 1; i >= 0; i--) {
+            if (newStep2[i] === undefined || newStep2[i] === "") {
+              newStep2[i] = poppedElement.writeDown;
+              break;
+            }
+          }
+
+          setStep2(newStep2);
+          currentStep2 = [...newStep2];
+        }
+      } else {
+        // Clear the interval if there's no more data to process
+        clearInterval(interval);
+      }
+    }, 2000); // 2-second delay
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
+  }, []); // Empty dependency array to run only on mount
+  if (!loaded && !error) {
+    return null;
+  }
   return (
-    <View style={{ padding: 20 }}>
-      {/* Carried digits row */}
-      <View
-        style={{ flexDirection: "row", justifyContent: "flex-end", height: 20 }}
-      >
-        <AnimatedDigit digit="  " appearDelay={0} />
-        {carry1 > 0 && (
-          <AnimatedDigit
-            digit={carry1.toString()}
-            appearDelay={STEP_DELAY}
-            disappearDelay={2 * STEP_DELAY}
-            shouldFade={true}
-          />
-        )}
+    <View style={{ flex: 1 }}>
+      <View>
+        <Text style={{ fontSize: 48, fontFamily: "BlexMono" }}>
+          {x}X{y}
+        </Text>
       </View>
-
-      {/* First number */}
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-        <AnimatedDigit digit="  " appearDelay={0} />
-        <AnimatedDigit digit={x1.toString()} appearDelay={0} />
-        <AnimatedDigit digit=" " appearDelay={0} />
-        <AnimatedDigit digit={x2.toString()} appearDelay={0} />
+      <View style={{ flexDirection: "row" }}>
+        {step1.map((s, i) => {
+          return (
+            <Text key={i} style={{ fontSize: 48, fontFamily: "BlexMono" }}>
+              {s}
+            </Text>
+          );
+        })}
       </View>
-
-      {/* Second number */}
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-        <AnimatedDigit digit="X " appearDelay={0} />
-        <AnimatedDigit digit={y1.toString()} appearDelay={0} />
-        <AnimatedDigit digit=" " appearDelay={0} />
-        <AnimatedDigit digit={y2.toString()} appearDelay={0} />
-      </View>
-
-      {/* First line */}
-      <Animated.Text
-        style={[
-          { fontFamily: "monospace" },
-          useAnimatedStyle(() => ({ opacity: lines.first.value })),
-        ]}
-      >
-        ---------
-      </Animated.Text>
-
-      {/* First row results (4 × 25 = 100) */}
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-        {firstRowDigits.map((digit, index) => (
-          <AnimatedDigit
-            key={index}
-            digit={digit}
-            appearDelay={STEP_DELAY + index * STEP_DELAY}
-          />
-        ))}
-      </View>
-
-      {/* Second row results (3 × 25 = 75) */}
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-        {secondRowDigits.map((digit, index) => (
-          <AnimatedDigit
-            key={index}
-            digit={digit}
-            appearDelay={4 * STEP_DELAY + index * STEP_DELAY}
-          />
-        ))}
-      </View>
-
-      {/* Final line */}
-      <Animated.Text
-        style={[
-          { fontFamily: "monospace" },
-          useAnimatedStyle(() => ({ opacity: lines.second.value })),
-        ]}
-      >
-        ---------
-      </Animated.Text>
-
-      {/* Final result */}
-      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-        <AnimatedDigit
-          digit={(x * y).toString()}
-          appearDelay={7 * STEP_DELAY}
-        />
+      <View style={{ flexDirection: "row" }}>
+        {step2.map((s, i) => {
+          return (
+            <Text key={i} style={{ fontSize: 48, fontFamily: "BlexMono" }}>
+              {s}
+            </Text>
+          );
+        })}
       </View>
     </View>
   );
