@@ -1,4 +1,4 @@
-import { View, StyleSheet, TextInput, Pressable, Text } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import {
   Canvas,
   Path,
@@ -6,7 +6,7 @@ import {
   useFont,
   Group,
 } from "@shopify/react-native-skia";
-import Animated, {
+import {
   useDerivedValue,
   useSharedValue,
   withDelay,

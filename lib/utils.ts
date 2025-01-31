@@ -349,3 +349,24 @@ export const darkenColor = (color: string, opacity: number): string => {
   const [r, g, b] = hexToRgb(color);
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
+
+function createLoggedObject(obj: any) {
+  return new Proxy(obj, {
+    set(target, prop, value) {
+      // Log the property name and value
+      //@ts-ignore
+      console.log(`${prop} =`, value);
+
+      // If the value is an object, recursively create a logged version of it
+      if (typeof value === "object" && value !== null) {
+        target[prop] = createLoggedObject(value);
+      } else {
+        target[prop] = value;
+      }
+
+      return true;
+    },
+  });
+}
+
+export const l = createLoggedObject({});
