@@ -5,6 +5,7 @@ import {
   useFont,
   Group,
   Path,
+  interpolate,
 } from "@shopify/react-native-skia";
 import {
   useDerivedValue,
@@ -34,6 +35,8 @@ type Step = {
   multiplierDigit: number;
   multiplicandDigit: number;
   shift: number;
+  x: number; // New property for x position
+  y: number; // New property for y position
 };
 
 const SPACING = 50;
@@ -42,9 +45,8 @@ const BASE_Y = 120;
 const STEP_HEIGHT = 80;
 const LINE_WIDTH = 200;
 
-const STEP_DELAY = 7000;
+const STEP_DELAY = 1000;
 const ANIMATION_DURATION = 2000;
-const MAX_STEPS = 10;
 
 type MultiplicationAnimatorProps = {
   multiplicand?: number;
@@ -55,78 +57,51 @@ const MultiplicationAnimator = ({
   multiplicand = 85,
   multiplier = 94,
 }: MultiplicationAnimatorProps) => {
-  const [steps, setSteps] = useState<Step[]>([]);
+  const steps = cal();
+  // const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(-1);
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Animation shared values
-  const opacities = Array(MAX_STEPS)
-    .fill(0)
-    .map(() => useSharedValue(0));
+  const opacities = steps.map(() => useSharedValue(0));
   const derivedOpacities = opacities.map((opacity) =>
     useDerivedValue(() => opacity.value),
   );
-  const opacitiesForCarry = Array(MAX_STEPS)
-    .fill(0)
-    .map(() => useSharedValue(0));
+  const opacitiesForCarry = steps.map(() => useSharedValue(0));
   const derivedOpacitiesForCarry = opacitiesForCarry.map((opacity) =>
     useDerivedValue(() => opacity.value),
   );
+  const xy = steps.map(() => useSharedValue(0));
+  const xWriteDownValues = steps.map((_, stepIndex) =>
+    useDerivedValue(() => {
+      return interpolate(
+        xy[stepIndex].value,
+        [0, 1],
+        [80, steps[stepIndex]?.x || 80],
+      );
+    }),
+  );
 
+  const yWriteDownValues = steps.map((_, stepIndex) =>
+    useDerivedValue(() => {
+      return interpolate(
+        xy[stepIndex].value,
+        [0, 1],
+        [sh / 2 + 40, steps[stepIndex]?.y || sh / 2 + 40],
+      );
+    }),
+  );
   const font = useFont(require("../assets/BlexMonoNerdFont-Regular.ttf"), 24);
 
-  const calculateSteps = useCallback(() => {
-    // const multiplicandStr = multiplicand.toString();
-    // const multiplierStr = multiplier.toString();
-    const multiplicandStr = "85";
-    const multiplierStr = "94";
-    const newSteps: Step[] = [];
-
-    // Calculate each step of multiplication
-    for (let i = multiplierStr.length - 1; i >= 0; i--) {
-      const shift = multiplierStr.length - 1 - i;
-      let carry = 0;
-
-      for (let j = multiplicandStr.length - 1; j >= 0; j--) {
-        const multiplierDigit = parseInt(multiplierStr[i]);
-        const multiplicandDigit = parseInt(multiplicandStr[j]);
-
-        const product = multiplierDigit * multiplicandDigit + carry;
-        const writeDown = product % 10;
-        carry = Math.floor(product / 10);
-
-        newSteps.push({
-          value: product,
-          carry,
-          writeDown,
-          multiplierDigit,
-          multiplicandDigit,
-          shift,
-        });
-      }
-
-      // Handle final carry if exists
-      if (carry > 0) {
-        newSteps.push({
-          value: carry,
-          carry: 0,
-          writeDown: carry,
-          multiplierDigit: parseInt(multiplierStr[i]),
-          multiplicandDigit: 0,
-          shift,
-        });
-      }
-    }
-
-    setSteps(newSteps);
+  const setup = useCallback(() => {
     setCurrentStep(-1);
     setIsAnimating(false);
   }, [multiplicand, multiplier]);
 
   useFocusEffect(
     useCallback(() => {
-      calculateSteps();
-    }, [calculateSteps]),
+      setup();
+    }, [setup]),
   );
 
   useEffect(() => {
@@ -137,37 +112,39 @@ const MultiplicationAnimator = ({
 
   const animateStep = useCallback(
     (stepIndex: number) => {
-      if (stepIndex >= MAX_STEPS) return;
-
       setIsAnimating(true);
 
-      const delay = stepIndex === 0 ? 10 : STEP_DELAY;
-      const hide = stepIndex === 0 ? 4000 : 10;
-
+      // Animate opacitiesForCarry
       opacitiesForCarry[stepIndex].value = withSequence(
-        withDelay(delay, withTiming(1, { duration: ANIMATION_DURATION })),
-        withSpring(1),
-        withDelay(
-          delay + hide,
-          withTiming(0, { duration: ANIMATION_DURATION }),
-        ),
+        withDelay(STEP_DELAY, withTiming(1, { duration: ANIMATION_DURATION })), // Fade in
+        withTiming(0, { duration: ANIMATION_DURATION }), // Fade out
       );
 
+      // Animate opacities
       opacities[stepIndex].value = withSequence(
         withDelay(
-          delay + 4000,
+          STEP_DELAY + ANIMATION_DURATION,
           withTiming(1, { duration: ANIMATION_DURATION }),
-        ),
-        withSpring(1),
+        ), // Fade in
+        withSpring(1), // Stay visible
       );
 
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, delay + ANIMATION_DURATION);
+      xy[stepIndex].value = withSequence(
+        withDelay(
+          STEP_DELAY + ANIMATION_DURATION,
+          withTiming(1, { duration: ANIMATION_DURATION }),
+        ), // Fade in
+      );
+      // Mark animation as complete after all animations finish
+      setTimeout(
+        () => {
+          setIsAnimating(false);
+        },
+        STEP_DELAY + 2 * ANIMATION_DURATION,
+      ); // Total duration for this step
     },
     [currentStep],
   );
-
   const nextStep = () => {
     if (isAnimating) return;
 
@@ -229,7 +206,6 @@ const MultiplicationAnimator = ({
     <Group>
       {steps.map((step, stepIndex) => {
         if (stepIndex > currentStep) return null;
-        if (stepIndex >= MAX_STEPS) return null;
 
         let val = "";
 
@@ -245,12 +221,6 @@ const MultiplicationAnimator = ({
           val = "";
         }
 
-        let len = steps.length;
-
-        let i = step.shift === 0 ? len - stepIndex - 1 : len - stepIndex + 2;
-        const xOffset = BASE_X - 150 + i * SPACING;
-        const yOffset = BASE_Y + 50 + step.shift * STEP_HEIGHT;
-
         return (
           <Group key={`step-${stepIndex}`}>
             <SkiaText
@@ -260,11 +230,18 @@ const MultiplicationAnimator = ({
               font={font}
               opacity={derivedOpacitiesForCarry[stepIndex]}
             />
+            <SkiaText
+              x={80}
+              y={sh / 2 + 40}
+              text={(step.value % 10) + ""}
+              font={font}
+              opacity={derivedOpacitiesForCarry[stepIndex]}
+            />
             {/* Carry number (if exists) */}
             {step.carry > 0 && (
               <SkiaText
                 x={80}
-                y={sh / 2 + 40}
+                y={sh / 2 + 70}
                 text={`Current Carry: ${step.carry.toString()}`}
                 font={font}
                 opacity={derivedOpacitiesForCarry[stepIndex]}
@@ -273,7 +250,7 @@ const MultiplicationAnimator = ({
             {stepIndex > 0 && (
               <SkiaText
                 x={80}
-                y={sh / 2 + 70}
+                y={sh / 2 + 100}
                 text={`Prev Carry: ${steps[stepIndex - 1].carry.toString()}`}
                 font={font}
                 opacity={derivedOpacitiesForCarry[stepIndex]}
@@ -282,8 +259,8 @@ const MultiplicationAnimator = ({
 
             {/* Write down number */}
             <SkiaText
-              x={xOffset}
-              y={yOffset}
+              x={xWriteDownValues[stepIndex].value} // Use the precomputed x position
+              y={yWriteDownValues[stepIndex].value} // Use the precomputed y position
               text={step.writeDown.toString()}
               font={font}
               opacity={derivedOpacities[stepIndex]}
@@ -326,3 +303,63 @@ const styles = StyleSheet.create({
 });
 
 export default MultiplicationAnimator;
+
+const cal = () => {
+  const multiplicandStr = "85";
+  const multiplierStr = "94";
+  const newSteps: Step[] = [];
+
+  // Calculate each step of multiplication
+  for (let i = multiplierStr.length - 1; i >= 0; i--) {
+    const shift = multiplierStr.length - 1 - i;
+    let carry = 0;
+
+    for (let j = multiplicandStr.length - 1; j >= 0; j--) {
+      const multiplierDigit = parseInt(multiplierStr[i]);
+      const multiplicandDigit = parseInt(multiplicandStr[j]);
+
+      const product = multiplierDigit * multiplicandDigit + carry;
+      const writeDown = product % 10;
+      carry = Math.floor(product / 10);
+
+      // Calculate x and y positions for writeDown
+      const len = multiplicandStr.length * multiplierStr.length;
+      const iOffset =
+        shift === 0 ? len - newSteps.length - 1 : len - newSteps.length + 2;
+      const xOffset = BASE_X - 150 + iOffset * SPACING;
+      const yOffset = BASE_Y + 50 + shift * STEP_HEIGHT;
+
+      newSteps.push({
+        value: product,
+        carry,
+        writeDown,
+        multiplierDigit,
+        multiplicandDigit,
+        shift,
+        x: xOffset, // Store x position
+        y: yOffset, // Store y position
+      });
+    }
+
+    // Handle final carry if exists
+    if (carry > 0) {
+      const len = multiplicandStr.length * multiplierStr.length;
+      const iOffset =
+        shift === 0 ? len - newSteps.length - 1 : len - newSteps.length + 2;
+      const xOffset = BASE_X - 150 + iOffset * SPACING;
+      const yOffset = BASE_Y + 50 + shift * STEP_HEIGHT;
+
+      newSteps.push({
+        value: carry,
+        carry: 0,
+        writeDown: carry,
+        multiplierDigit: parseInt(multiplierStr[i]),
+        multiplicandDigit: 0,
+        shift,
+        x: xOffset, // Store x position
+        y: yOffset, // Store y position
+      });
+    }
+  }
+  return newSteps;
+};
