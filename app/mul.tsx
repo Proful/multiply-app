@@ -35,6 +35,8 @@ const CONSTANTS = {
   SPACING: 50,
   BASE_X: 150,
   BASE_Y: 120,
+  DIVIDER_START_X: 65,
+  DIVIDER_START_Y: 140,
   STEP_HEIGHT: 80,
   LINE_WIDTH: 200,
   STEP_DELAY: 1000,
@@ -84,13 +86,11 @@ interface StepValuesProps {
   prevCarry?: number;
   writeDownX: SharedValue<number>;
   writeDownY: SharedValue<number>;
-  opacity: SharedValue<number>;
   carryOpacity: SharedValue<number>;
   font: SkFont;
 }
 
 interface DerivedValues {
-  opacities: SharedValue<number>[];
   opacitiesForCarry: SharedValue<number>[];
   xWriteDown: SharedValue<number>[];
   yWriteDown: SharedValue<number>[];
@@ -109,7 +109,7 @@ const getCalculationText = (step: Step, prevCarry?: number): string => {
 
 const calculatePositionForStep = (
   shift: number,
-  stepsLength: number,
+  _stepsLength: number,
   currentSteps: Step[],
   multiplicandLength: number,
   multiplierLength: number,
@@ -119,7 +119,7 @@ const calculatePositionForStep = (
     shift === 0 ? len - currentSteps.length - 1 : len - currentSteps.length + 2;
 
   return {
-    x: CONSTANTS.BASE_X - 150 + iOffset * CONSTANTS.SPACING,
+    x: CONSTANTS.BASE_X - 100 + iOffset * CONSTANTS.SPACING,
     y: CONSTANTS.BASE_Y + 50 + shift * CONSTANTS.STEP_HEIGHT,
   };
 };
@@ -199,7 +199,6 @@ const StepValues: React.FC<StepValuesProps> = ({
   prevCarry,
   writeDownX,
   writeDownY,
-  opacity,
   carryOpacity,
   font,
 }) => (
@@ -234,7 +233,7 @@ const StepValues: React.FC<StepValuesProps> = ({
       y={writeDownY}
       text={step.writeDown.toString()}
       font={font}
-      opacity={opacity}
+      opacity={1}
     />
   </Group>
 );
@@ -250,7 +249,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
       .map((char, i) => (
         <SkiaText
           key={`multiplicand-${i}`}
-          x={CONSTANTS.BASE_X + i * 40}
+          x={CONSTANTS.BASE_X + i * 50}
           y={CONSTANTS.BASE_Y - 40}
           text={char}
           font={font}
@@ -261,7 +260,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
       .map((char, i) => (
         <SkiaText
           key={`multiplier-${i}`}
-          x={CONSTANTS.BASE_X + i * 40}
+          x={CONSTANTS.BASE_X + i * 50}
           y={CONSTANTS.BASE_Y}
           text={char}
           font={font}
@@ -274,9 +273,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
       font={font}
     />
     <Path
-      path={`M ${CONSTANTS.BASE_X - 30} ${CONSTANTS.BASE_Y + 20} h ${
-        CONSTANTS.LINE_WIDTH
-      }`}
+      path={`M ${CONSTANTS.DIVIDER_START_X} ${CONSTANTS.DIVIDER_START_Y} h ${CONSTANTS.LINE_WIDTH}`}
       strokeWidth={2}
       style="stroke"
       color="#000"
@@ -310,7 +307,6 @@ const StepsDisplay: React.FC<StepsDisplayProps> = ({
             prevCarry={steps[i - 1]?.carry}
             writeDownX={derivedValues.xWriteDown[i]}
             writeDownY={derivedValues.yWriteDown[i]}
-            opacity={derivedValues.opacities[i]}
             carryOpacity={derivedValues.opacitiesForCarry[i]}
             font={font}
           />
@@ -318,8 +314,8 @@ const StepsDisplay: React.FC<StepsDisplayProps> = ({
       );
     })}
     <Path
-      path={`M ${CONSTANTS.BASE_X - 30} ${
-        CONSTANTS.BASE_Y + 20 + CONSTANTS.STEP_HEIGHT * 2
+      path={`M ${CONSTANTS.DIVIDER_START_X} ${
+        CONSTANTS.DIVIDER_START_Y + CONSTANTS.STEP_HEIGHT * 2
       } h ${CONSTANTS.LINE_WIDTH}`}
       strokeWidth={2}
       style="stroke"
@@ -337,11 +333,6 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   const [currentStep, setCurrentStep] = useState(-1);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Animation shared values
-  const opacities = steps.map(() => useSharedValue(0));
-  const derivedOpacities = opacities.map((opacity) =>
-    useDerivedValue(() => opacity.value),
-  );
   const opacitiesForCarry = steps.map(() => useSharedValue(0));
   const derivedOpacitiesForCarry = opacitiesForCarry.map((opacity) =>
     useDerivedValue(() => opacity.value),
@@ -368,7 +359,6 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   );
 
   const derivedValues = {
-    opacities: derivedOpacities,
     opacitiesForCarry: derivedOpacitiesForCarry,
     xWriteDown: xWriteDownValues,
     yWriteDown: yWriteDownValues,
@@ -406,15 +396,6 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
         withTiming(0, { duration: CONSTANTS.ANIMATION_DURATION }), // Fade out
       );
 
-      // Animate opacities
-      opacities[stepIndex].value = withSequence(
-        withDelay(
-          CONSTANTS.STEP_DELAY + CONSTANTS.ANIMATION_DURATION,
-          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
-        ), // Fade in
-        withSpring(1), // Stay visible
-      );
-
       xy[stepIndex].value = withSequence(
         withDelay(
           CONSTANTS.STEP_DELAY + CONSTANTS.ANIMATION_DURATION,
@@ -437,7 +418,9 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
     const nextStepIndex = currentStep + 1;
     if (currentStep < steps.length - 1) {
       setCurrentStep(nextStepIndex);
-      animateStep(nextStepIndex);
+      if (currentStep < 5) {
+        animateStep(nextStepIndex);
+      }
     }
   };
 
