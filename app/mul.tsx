@@ -29,7 +29,6 @@ configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false,
 });
-
 // Constants
 const CONSTANTS = {
   SPACING: 50,
@@ -39,7 +38,7 @@ const CONSTANTS = {
   DIVIDER_START_Y: 140,
   STEP_HEIGHT: 80,
   LINE_WIDTH: 200,
-  STEP_DELAY: 9000,
+  STEP_DELAY: 2000,
   ANIMATION_DURATION: 2000,
 } as const;
 
@@ -188,7 +187,6 @@ const calculateSteps = (multiplicand: number, multiplier: number): Step[] => {
 
   return steps;
 };
-
 // SubComponents
 const StepCalculation: React.FC<StepCalculationProps> = ({
   text,
@@ -196,8 +194,12 @@ const StepCalculation: React.FC<StepCalculationProps> = ({
   y,
   font,
   opacity,
-}) => <SkiaText x={x} y={y} text={text} font={font} opacity={opacity} />;
+}) => {
+  if (!text || !font) return null;
+  return <SkiaText x={x} y={y} text={text} font={font} opacity={opacity} />;
+};
 
+// Modified StepValues component with null checks
 const StepValues: React.FC<StepValuesProps> = ({
   step,
   prevCarry,
@@ -206,136 +208,146 @@ const StepValues: React.FC<StepValuesProps> = ({
   carryOpacity,
   writeDownOpacity,
   font,
-}) => (
-  <Group>
-    <SkiaText
-      x={80}
-      y={sh / 2 + 40}
-      text={(step.value % 10).toString()}
-      font={font}
-      opacity={carryOpacity}
-    />
-    {step.carry > 0 && (
-      <SkiaText
-        x={80}
-        y={sh / 2 + 70}
-        text={`Current Carry: ${step.carry}`}
-        font={font}
-        opacity={carryOpacity}
-      />
-    )}
-    {prevCarry !== undefined && (
-      <SkiaText
-        x={80}
-        y={sh / 2 + 100}
-        text={`Prev Carry: ${prevCarry}`}
-        font={font}
-        opacity={carryOpacity}
-      />
-    )}
-    <SkiaText
-      x={writeDownX}
-      y={writeDownY}
-      text={step.writeDown.toString()}
-      font={font}
-      opacity={writeDownOpacity}
-    />
-  </Group>
-);
+}) => {
+  if (!font) return null;
+  return (
+    <Group>
+      {step.value !== undefined && (
+        <SkiaText
+          x={80}
+          y={sh / 2 + 40}
+          text={(step.value % 10).toString()}
+          font={font}
+          opacity={carryOpacity}
+        />
+      )}
+      {step.carry > 0 && (
+        <SkiaText
+          x={80}
+          y={sh / 2 + 70}
+          text={`Current Carry: ${step.carry}`}
+          font={font}
+          opacity={carryOpacity}
+        />
+      )}
+      {prevCarry !== undefined && (
+        <SkiaText
+          x={80}
+          y={sh / 2 + 100}
+          text={`Prev Carry: ${prevCarry}`}
+          font={font}
+          opacity={carryOpacity}
+        />
+      )}
+      {step.writeDown !== undefined && (
+        <SkiaText
+          x={writeDownX}
+          y={writeDownY}
+          text={step.writeDown.toString()}
+          font={font}
+          opacity={writeDownOpacity}
+        />
+      )}
+    </Group>
+  );
+};
 
+// Modified MultiplicationDisplay component with null checks
 const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
   multiplicand,
   multiplier,
   font,
-}) => (
-  <Group>
-    {String(multiplicand)
-      .split("")
-      .map((char, i) => (
-        <SkiaText
-          key={`multiplicand-${i}`}
-          x={CONSTANTS.BASE_X + i * 50}
-          y={CONSTANTS.BASE_Y - 40}
-          text={char}
-          font={font}
-        />
-      ))}
-    {String(multiplier)
-      .split("")
-      .map((char, i) => (
-        <SkiaText
-          key={`multiplier-${i}`}
-          x={CONSTANTS.BASE_X + i * 50}
-          y={CONSTANTS.BASE_Y}
-          text={char}
-          font={font}
-        />
-      ))}
-    <SkiaText
-      x={CONSTANTS.BASE_X - 30}
-      y={CONSTANTS.BASE_Y}
-      text="×"
-      font={font}
-    />
-    <Path
-      path={`M ${CONSTANTS.DIVIDER_START_X} ${CONSTANTS.DIVIDER_START_Y} h ${CONSTANTS.LINE_WIDTH}`}
-      strokeWidth={2}
-      style="stroke"
-      color="#000"
-    />
-  </Group>
-);
+}) => {
+  if (!font) return null;
+  return (
+    <Group>
+      {String(multiplicand)
+        .split("")
+        .map((char, i) => (
+          <SkiaText
+            key={`multiplicand-${i}`}
+            x={CONSTANTS.BASE_X + i * 50}
+            y={CONSTANTS.BASE_Y - 40}
+            text={char}
+            font={font}
+          />
+        ))}
+      {String(multiplier)
+        .split("")
+        .map((char, i) => (
+          <SkiaText
+            key={`multiplier-${i}`}
+            x={CONSTANTS.BASE_X + i * 50}
+            y={CONSTANTS.BASE_Y}
+            text={char}
+            font={font}
+          />
+        ))}
+      <SkiaText
+        x={CONSTANTS.BASE_X - 30}
+        y={CONSTANTS.BASE_Y}
+        text="×"
+        font={font}
+      />
+      <Path
+        path={`M ${CONSTANTS.DIVIDER_START_X} ${CONSTANTS.DIVIDER_START_Y} h ${CONSTANTS.LINE_WIDTH}`}
+        strokeWidth={2}
+        style="stroke"
+        color="#000"
+      />
+    </Group>
+  );
+};
 
+// Modified StepsDisplay component with null checks
 const StepsDisplay: React.FC<StepsDisplayProps> = ({
   steps,
   currentStep,
   derivedValues,
   font,
-}) => (
-  <Group>
-    {steps.map((step, i) => {
-      if (i > currentStep) return null;
+}) => {
+  if (!font) return null;
+  return (
+    <Group>
+      {steps.map((step, i) => {
+        if (i > currentStep) return null;
 
-      if (i === 0) {
-        l.f = "-----------------  " + currentStep;
-      }
-      const calcText = getCalculationText(step, steps[i - 1]?.carry);
-      // l.text = { i, calcText };
-      // l.step = step;
+        const calcText = getCalculationText(step, steps[i - 1]?.carry);
 
-      return (
-        <Group key={`step-${i}`}>
-          <StepCalculation
-            text={calcText}
-            x={80}
-            y={sh / 2 + 10}
-            font={font}
-            opacity={derivedValues.opacitiesForCarry[i]}
-          />
-          <StepValues
-            step={step}
-            prevCarry={steps[i - 1]?.carry}
-            writeDownX={derivedValues.xWriteDown[i]}
-            writeDownY={derivedValues.yWriteDown[i]}
-            carryOpacity={derivedValues.opacitiesForCarry[i]}
-            writeDownOpacity={derivedValues.opacitiesForWriteDown[i]}
-            font={font}
-          />
-        </Group>
-      );
-    })}
-    <Path
-      path={`M ${CONSTANTS.DIVIDER_START_X} ${
-        CONSTANTS.DIVIDER_START_Y + CONSTANTS.STEP_HEIGHT * 2
-      } h ${CONSTANTS.LINE_WIDTH}`}
-      strokeWidth={2}
-      style="stroke"
-      color="#000"
-    />
-  </Group>
-);
+        return (
+          <Group key={`step-${i}`}>
+            <StepCalculation
+              text={calcText}
+              x={80}
+              y={sh / 2 + 10}
+              font={font}
+              opacity={derivedValues.opacitiesForCarry[i]}
+            />
+            <StepValues
+              step={step}
+              prevCarry={steps[i - 1]?.carry}
+              writeDownX={derivedValues.xWriteDown[i]}
+              writeDownY={derivedValues.yWriteDown[i]}
+              carryOpacity={derivedValues.opacitiesForCarry[i]}
+              writeDownOpacity={derivedValues.opacitiesForWriteDown[i]}
+              font={font}
+            />
+          </Group>
+        );
+      })}
+      <Path
+        path={`M ${CONSTANTS.DIVIDER_START_X} ${
+          CONSTANTS.DIVIDER_START_Y + CONSTANTS.STEP_HEIGHT * 2
+        } h ${CONSTANTS.LINE_WIDTH}`}
+        strokeWidth={2}
+        style="stroke"
+        color="#000"
+      />
+    </Group>
+  );
+};
 
-// Main Component
+// Modified main component with font loading check
 const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   multiplicand = 85,
   multiplier = 94,
@@ -343,6 +355,7 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   const steps = calculateSteps(multiplicand, multiplier);
   const [currentStep, setCurrentStep] = useState(-1);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false);
 
   const opacitiesForCarry = steps.map(() => useSharedValue(0));
   const derivedOpacitiesForCarry = opacitiesForCarry.map((opacity) =>
@@ -384,6 +397,12 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
 
   const font = useFont(require("../assets/BlexMonoNerdFont-Regular.ttf"), 24);
 
+  useEffect(() => {
+    if (font) {
+      setFontLoaded(true);
+    }
+  }, [font]);
+
   const setup = useCallback(() => {
     setCurrentStep(-1);
     setIsAnimating(false);
@@ -396,61 +415,67 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   );
 
   useEffect(() => {
-    if (currentStep >= -1 && currentStep < steps.length - 1 && !isAnimating) {
+    if (
+      currentStep >= -1 &&
+      currentStep < steps.length - 1 &&
+      !isAnimating &&
+      fontLoaded
+    ) {
       nextStep();
     }
-  }, [currentStep, isAnimating, steps]);
+  }, [currentStep, isAnimating, steps, fontLoaded]);
 
   const animateStep = useCallback(
     (stepIndex: number) => {
+      if (!fontLoaded) return;
+
       setIsAnimating(true);
 
-      // Animate opacitiesForCarry
       opacitiesForCarry[stepIndex].value = withSequence(
         withDelay(
           CONSTANTS.STEP_DELAY,
-          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
-        ), // Fade in
-        withTiming(0, { duration: CONSTANTS.ANIMATION_DURATION }), // Fade out
+          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION * 2 }),
+        ),
+        withTiming(0, { duration: CONSTANTS.ANIMATION_DURATION }),
       );
 
       opacitiesForWriteDown[stepIndex].value = withSequence(
         withDelay(
           CONSTANTS.STEP_DELAY,
           withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
-        ), // Fade in
+        ),
       );
 
       xy[stepIndex].value = withSequence(
         withDelay(
           CONSTANTS.STEP_DELAY + CONSTANTS.ANIMATION_DURATION,
           withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
-        ), // Fade in
+        ),
       );
-      // Mark animation as complete after all animations finish
+
       setTimeout(
         () => {
           setIsAnimating(false);
         },
         CONSTANTS.STEP_DELAY + 2 * CONSTANTS.ANIMATION_DURATION,
-      ); // Total duration for this step
+      );
     },
-    [currentStep],
+    [currentStep, fontLoaded],
   );
 
   const nextStep = () => {
-    if (isAnimating) return;
+    if (isAnimating || !fontLoaded) return;
 
     const nextStepIndex = currentStep + 1;
     if (currentStep < steps.length - 1) {
-      if (currentStep < 7) {
-        setCurrentStep(nextStepIndex);
-        animateStep(nextStepIndex);
-      }
+      setCurrentStep(nextStepIndex);
+      animateStep(nextStepIndex);
     }
   };
 
-  if (!font) return <View style={styles.container} />;
+  if (!fontLoaded) {
+    return <View style={styles.container} />;
+  }
 
   return (
     <View style={styles.container}>
@@ -458,20 +483,19 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
         <MultiplicationDisplay
           multiplicand={multiplicand}
           multiplier={multiplier}
-          font={font}
+          font={font!}
         />
         <StepsDisplay
           steps={steps}
           currentStep={currentStep}
           derivedValues={derivedValues}
-          font={font}
+          font={font!}
         />
       </Canvas>
     </View>
   );
 };
 
-// Styles
 const { width: sw, height: sh } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
