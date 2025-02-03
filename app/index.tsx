@@ -122,7 +122,7 @@ const data = [
   }, // Green
   {
     // route: "/multiplication",
-    route: "/mul",
+    route: "/multi",
     title: "Multiplication",
     description: "Master the art of multiplication.",
     color: "#FF5722",

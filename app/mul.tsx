@@ -23,6 +23,7 @@ import {
   ReanimatedLogLevel,
 } from "react-native-reanimated";
 import { l } from "@/lib/utils";
+import { colors } from "@/lib/styles";
 
 // Configure Reanimated Logger
 configureReanimatedLogger({
@@ -33,10 +34,10 @@ configureReanimatedLogger({
 const CONSTANTS = {
   SPACING: 50,
   BASE_X: 150,
-  BASE_Y: 120,
+  BASE_Y: 160,
   DIVIDER_START_X: 65,
-  DIVIDER_START_Y: 140,
-  STEP_HEIGHT: 80,
+  DIVIDER_START_Y: 180,
+  STEP_HEIGHT: 50,
   LINE_WIDTH: 200,
   STEP_DELAY: 2000,
   ANIMATION_DURATION: 2000,
@@ -117,9 +118,15 @@ const calculatePositionForStep = (
   multiplicandLength: number,
   multiplierLength: number,
 ): { x: number; y: number } => {
+  // monkey patching
+  const step1Count = currentSteps.filter((s) => s.shift === 0).length;
+  let step1LengthOffset = step1Count === 3 ? 2 : 1;
+
   const len = multiplicandLength * multiplierLength;
   const iOffset =
-    shift === 0 ? len - currentSteps.length - 1 : len - currentSteps.length + 2;
+    shift === 0
+      ? len - currentSteps.length - 1
+      : len - currentSteps.length + step1LengthOffset;
 
   return {
     x: CONSTANTS.BASE_X - 100 + iOffset * CONSTANTS.SPACING,
@@ -196,7 +203,16 @@ const StepCalculation: React.FC<StepCalculationProps> = ({
   opacity,
 }) => {
   if (!text || !font) return null;
-  return <SkiaText x={x} y={y} text={text} font={font} opacity={opacity} />;
+  return (
+    <SkiaText
+      x={x}
+      y={y}
+      text={text}
+      font={font}
+      opacity={opacity}
+      color={colors.card.fg}
+    />
+  );
 };
 
 // Modified StepValues component with null checks
@@ -219,6 +235,7 @@ const StepValues: React.FC<StepValuesProps> = ({
           text={(step.value % 10).toString()}
           font={font}
           opacity={carryOpacity}
+          color={colors.card.fg}
         />
       )}
       {step.carry > 0 && (
@@ -228,6 +245,7 @@ const StepValues: React.FC<StepValuesProps> = ({
           text={`Current Carry: ${step.carry}`}
           font={font}
           opacity={carryOpacity}
+          color={colors.card.fg}
         />
       )}
       {prevCarry !== undefined && (
@@ -237,6 +255,7 @@ const StepValues: React.FC<StepValuesProps> = ({
           text={`Prev Carry: ${prevCarry}`}
           font={font}
           opacity={carryOpacity}
+          color={colors.card.fg}
         />
       )}
       {step.writeDown !== undefined && (
@@ -246,6 +265,7 @@ const StepValues: React.FC<StepValuesProps> = ({
           text={step.writeDown.toString()}
           font={font}
           opacity={writeDownOpacity}
+          color={colors.card.fg}
         />
       )}
     </Group>
@@ -270,6 +290,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
             y={CONSTANTS.BASE_Y - 40}
             text={char}
             font={font}
+            color={colors.card.fg}
           />
         ))}
       {String(multiplier)
@@ -281,6 +302,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
             y={CONSTANTS.BASE_Y}
             text={char}
             font={font}
+            color={colors.card.fg}
           />
         ))}
       <SkiaText
@@ -288,12 +310,13 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
         y={CONSTANTS.BASE_Y}
         text="×"
         font={font}
+        color={colors.card.fg}
       />
       <Path
         path={`M ${CONSTANTS.DIVIDER_START_X} ${CONSTANTS.DIVIDER_START_Y} h ${CONSTANTS.LINE_WIDTH}`}
         strokeWidth={2}
         style="stroke"
-        color="#000"
+        color={colors.card.fg}
       />
     </Group>
   );
@@ -341,7 +364,7 @@ const StepsDisplay: React.FC<StepsDisplayProps> = ({
         } h ${CONSTANTS.LINE_WIDTH}`}
         strokeWidth={2}
         style="stroke"
-        color="#000"
+        color={colors.card.fg}
       />
     </Group>
   );
@@ -349,8 +372,8 @@ const StepsDisplay: React.FC<StepsDisplayProps> = ({
 
 // Modified main component with font loading check
 const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
-  multiplicand = 85,
-  multiplier = 94,
+  multiplicand = 15,
+  multiplier = 20,
 }) => {
   const steps = calculateSteps(multiplicand, multiplier);
   const [currentStep, setCurrentStep] = useState(-1);
