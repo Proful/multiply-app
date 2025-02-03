@@ -40,7 +40,7 @@ const CONSTANTS = {
   STEP_HEIGHT: 50,
   LINE_WIDTH: 200,
   STEP_DELAY: 2000,
-  ANIMATION_DURATION: 2000,
+  ANIMATION_DURATION: 4000,
 } as const;
 
 // Types
@@ -203,13 +203,16 @@ const StepCalculation: React.FC<StepCalculationProps> = ({
   opacity,
 }) => {
   if (!text || !font) return null;
+  const op = useDerivedValue(() => {
+    return interpolate(opacity.value, [0, 0.2, 1, 0], [0, 1, 1, 0]);
+  });
   return (
     <SkiaText
       x={x}
       y={y}
       text={text}
       font={font}
-      opacity={opacity}
+      opacity={op}
       color={colors.card.fg}
     />
   );
@@ -226,6 +229,9 @@ const StepValues: React.FC<StepValuesProps> = ({
   font,
 }) => {
   if (!font) return null;
+  const op = useDerivedValue(() => {
+    return interpolate(writeDownOpacity.value, [0, 0.4, 1, 0], [0, 0, 1, 1]);
+  });
   return (
     <Group>
       {step.value !== undefined && (
@@ -264,7 +270,7 @@ const StepValues: React.FC<StepValuesProps> = ({
           y={writeDownY}
           text={step.writeDown.toString()}
           font={font}
-          opacity={writeDownOpacity}
+          opacity={op}
           color={colors.card.fg}
         />
       )}
@@ -440,7 +446,7 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   useEffect(() => {
     if (
       currentStep >= -1 &&
-      currentStep < steps.length - 1 &&
+      currentStep < steps.length - 5 &&
       !isAnimating &&
       fontLoaded
     ) {
@@ -454,34 +460,31 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
 
       setIsAnimating(true);
 
+      let t1 = CONSTANTS.ANIMATION_DURATION;
+      let t2 = CONSTANTS.ANIMATION_DURATION * 2;
+      let sd1 = stepIndex === 0 ? 10 : CONSTANTS.STEP_DELAY;
+      let sd2 = sd1 + t1;
+      let sd3 = sd1 + t2;
+
+      l.sd1 = sd1;
+
       opacitiesForCarry[stepIndex].value = withSequence(
-        withDelay(
-          CONSTANTS.STEP_DELAY,
-          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION * 2 }),
-        ),
-        withTiming(0, { duration: CONSTANTS.ANIMATION_DURATION }),
+        withDelay(sd1, withTiming(1, { duration: t2 })),
+        withTiming(0, { duration: t1 }),
       );
 
       opacitiesForWriteDown[stepIndex].value = withSequence(
-        withDelay(
-          CONSTANTS.STEP_DELAY,
-          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
-        ),
+        withTiming(0, { duration: 0 }),
+        withDelay(sd2, withTiming(1, { duration: t2 })),
       );
 
       xy[stepIndex].value = withSequence(
-        withDelay(
-          CONSTANTS.STEP_DELAY + CONSTANTS.ANIMATION_DURATION,
-          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
-        ),
+        withDelay(sd2, withTiming(1, { duration: t1 })),
       );
 
-      setTimeout(
-        () => {
-          setIsAnimating(false);
-        },
-        CONSTANTS.STEP_DELAY + 2 * CONSTANTS.ANIMATION_DURATION,
-      );
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, sd3);
     },
     [currentStep, fontLoaded],
   );
