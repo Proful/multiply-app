@@ -13,7 +13,6 @@ import {
   useSharedValue,
   withDelay,
   withSequence,
-  withSpring,
   withTiming,
   SharedValue,
 } from "react-native-reanimated";
@@ -23,6 +22,7 @@ import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
+import { l } from "@/lib/utils";
 
 // Configure Reanimated Logger
 configureReanimatedLogger({
@@ -39,7 +39,7 @@ const CONSTANTS = {
   DIVIDER_START_Y: 140,
   STEP_HEIGHT: 80,
   LINE_WIDTH: 200,
-  STEP_DELAY: 1000,
+  STEP_DELAY: 9000,
   ANIMATION_DURATION: 2000,
 } as const;
 
@@ -87,11 +87,13 @@ interface StepValuesProps {
   writeDownX: SharedValue<number>;
   writeDownY: SharedValue<number>;
   carryOpacity: SharedValue<number>;
+  writeDownOpacity: SharedValue<number>;
   font: SkFont;
 }
 
 interface DerivedValues {
   opacitiesForCarry: SharedValue<number>[];
+  opacitiesForWriteDown: SharedValue<number>[];
   xWriteDown: SharedValue<number>[];
   yWriteDown: SharedValue<number>[];
 }
@@ -100,11 +102,13 @@ interface DerivedValues {
 const getCalculationText = (step: Step, prevCarry?: number): string => {
   if (!step.multiplicandDigit) return "";
 
+  const { multiplicandDigit: md, multiplierDigit: mr } = step;
+
   if (prevCarry && prevCarry > 0) {
-    return `${step.multiplierDigit}×${step.multiplicandDigit}+${prevCarry}=${step.multiplicandDigit * step.multiplierDigit}+${prevCarry}=${step.multiplicandDigit * step.multiplierDigit + prevCarry}`;
+    return `${mr}×${md}+${prevCarry}=${md * mr}+${prevCarry}=${md * mr + prevCarry}`;
   }
 
-  return `${step.multiplierDigit}×${step.multiplicandDigit}=${step.multiplicandDigit * step.multiplierDigit}`;
+  return `${mr}×${md}=${md * mr}`;
 };
 
 const calculatePositionForStep = (
@@ -200,6 +204,7 @@ const StepValues: React.FC<StepValuesProps> = ({
   writeDownX,
   writeDownY,
   carryOpacity,
+  writeDownOpacity,
   font,
 }) => (
   <Group>
@@ -233,7 +238,7 @@ const StepValues: React.FC<StepValuesProps> = ({
       y={writeDownY}
       text={step.writeDown.toString()}
       font={font}
-      opacity={1}
+      opacity={writeDownOpacity}
     />
   </Group>
 );
@@ -291,7 +296,12 @@ const StepsDisplay: React.FC<StepsDisplayProps> = ({
     {steps.map((step, i) => {
       if (i > currentStep) return null;
 
+      if (i === 0) {
+        l.f = "-----------------  " + currentStep;
+      }
       const calcText = getCalculationText(step, steps[i - 1]?.carry);
+      // l.text = { i, calcText };
+      // l.step = step;
 
       return (
         <Group key={`step-${i}`}>
@@ -308,6 +318,7 @@ const StepsDisplay: React.FC<StepsDisplayProps> = ({
             writeDownX={derivedValues.xWriteDown[i]}
             writeDownY={derivedValues.yWriteDown[i]}
             carryOpacity={derivedValues.opacitiesForCarry[i]}
+            writeDownOpacity={derivedValues.opacitiesForWriteDown[i]}
             font={font}
           />
         </Group>
@@ -337,6 +348,12 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   const derivedOpacitiesForCarry = opacitiesForCarry.map((opacity) =>
     useDerivedValue(() => opacity.value),
   );
+
+  const opacitiesForWriteDown = steps.map(() => useSharedValue(0));
+  const derivedOpacitiesForWriteDown = opacitiesForWriteDown.map((opacity) =>
+    useDerivedValue(() => opacity.value),
+  );
+
   const xy = steps.map(() => useSharedValue(0));
   const xWriteDownValues = steps.map((_, stepIndex) =>
     useDerivedValue(() => {
@@ -360,6 +377,7 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
 
   const derivedValues = {
     opacitiesForCarry: derivedOpacitiesForCarry,
+    opacitiesForWriteDown: derivedOpacitiesForWriteDown,
     xWriteDown: xWriteDownValues,
     yWriteDown: yWriteDownValues,
   };
@@ -396,6 +414,13 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
         withTiming(0, { duration: CONSTANTS.ANIMATION_DURATION }), // Fade out
       );
 
+      opacitiesForWriteDown[stepIndex].value = withSequence(
+        withDelay(
+          CONSTANTS.STEP_DELAY,
+          withTiming(1, { duration: CONSTANTS.ANIMATION_DURATION }),
+        ), // Fade in
+      );
+
       xy[stepIndex].value = withSequence(
         withDelay(
           CONSTANTS.STEP_DELAY + CONSTANTS.ANIMATION_DURATION,
@@ -412,13 +437,14 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
     },
     [currentStep],
   );
+
   const nextStep = () => {
     if (isAnimating) return;
 
     const nextStepIndex = currentStep + 1;
     if (currentStep < steps.length - 1) {
-      setCurrentStep(nextStepIndex);
-      if (currentStep < 5) {
+      if (currentStep < 7) {
+        setCurrentStep(nextStepIndex);
         animateStep(nextStepIndex);
       }
     }
