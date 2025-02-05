@@ -47,6 +47,7 @@ export default function Layout() {
         name="multiplication"
         options={{ title: "Multiplication" }}
       />
+      <Stack.Screen name="multi" options={{ title: "Multiplication" }} />
       <Stack.Screen
         name="multiplication_settings"
         options={{ title: "Settings Multiplication" }}

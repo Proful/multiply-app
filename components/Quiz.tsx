@@ -7,12 +7,11 @@ import {
   Dimensions,
   Alert,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Stack, useNavigation } from "expo-router";
+import { Stack } from "expo-router";
 
 const { width: sw, height: sh } = Dimensions.get("window");
 const USER_STYLES = {
@@ -60,8 +59,6 @@ type QuizScreenProp = {
   quizData: QuizData;
 };
 export default function QuizScreen({ quizData }: QuizScreenProp) {
-  const { id } = useLocalSearchParams();
-  const navigation = useNavigation();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [activeUser, setActiveUser] = useState<number>(1);
   const [showAnswer, setShowAnswer] = useState(false);

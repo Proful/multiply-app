@@ -5,7 +5,7 @@
 1. Start the app
 
 ```bash
-    npx expo start
+npx expo start
 ```
 
 1. Upgrade minor Dependencies
@@ -16,10 +16,30 @@ npx expo install --fix
 
 ## Dependencies
 
+0. bootstrap
+
+```sh
+nvm use default
+npx create-expo-app@latest
+npm run reset-project
+```
+
+1. Gesture and reanimated
+
+```bash
+npx expo install react-native-gesture-handler react-native-reanimated
+```
+
 1. Drawer Navigation
 
 ```bash
-npx expo install @react-navigation/drawer react-native-gesture-handler react-native-reanimated
+npx expo install expo-linear-gradient
+```
+
+1. Drawer Navigation
+
+```bash
+npx expo install @react-navigation/drawer
 ```
 
 1. Async Storage
