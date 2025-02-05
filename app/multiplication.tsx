@@ -1,27 +1,18 @@
-import { colors, fonts, sharedStyles } from "@/lib/styles";
-import { useFocusEffect } from "expo-router";
+import { colors, sharedStyles } from "@/lib/styles";
+import { router, useFocusEffect } from "expo-router";
 import React, { useState, useCallback } from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { darkenColor, getRandomNumber } from "@/lib/utils";
-import FiveDigitInput from "@/components/FiveDigitInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams } from "expo-router";
-import { useFonts } from "expo-font";
-import MText from "@/components/MText";
-import { FractionLine } from "@/components/FractionLine";
-import ResetButton from "@/components/ResetButton";
-import ResultButton from "@/components/ResultButton";
+import MultiplicationAnimator from "./multiplication_animator";
+import { AntDesign } from "@expo/vector-icons";
 
 const STORAGE_KEY = "multiplication";
-export default function Multiplication() {
+export default function App() {
   const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
-  const [seed, setSeed] = useState<number>(0);
-  const [result, setResult] = useState<string>("");
-  const [loaded, error] = useFonts({
-    BlexMono: require("../assets/BlexMonoNerdFont-Regular.ttf"),
-  });
 
   const setup = () => {
     const loadStoredData = async () => {
@@ -46,31 +37,14 @@ export default function Multiplication() {
 
       setFirstNumber(x);
       setSecondNumber(getRandomNumber(10, 99));
-      setSeed(getRandomNumber(10, 999999));
-      setResult("");
     };
 
     loadStoredData();
   };
 
   useFocusEffect(useCallback(setup, []));
-
-  const checkAnswer = (userValue: number) => {
-    const correctAnswer = firstNumber * secondNumber;
-
-    if (userValue === correctAnswer) {
-      setResult("correct");
-    } else {
-      setResult("wrong");
-    }
-  };
-
   const cardBg = colors.card[+(id as string) % 10];
-
-  if (!loaded && !error) {
-    return null;
-  }
-
+  const cardBgTint = darkenColor("#ffffff", 0.5);
   return (
     <>
       <View
@@ -81,27 +55,23 @@ export default function Multiplication() {
           },
         ]}
       >
-        <ResetButton onReset={setup} />
-        <ResultButton result={result} />
-
-        <View style={{ alignItems: "center" }}>
-          <MText style={{ letterSpacing: fonts.primary }}>{firstNumber}</MText>
-
-          <View>
-            <MText style={{ letterSpacing: fonts.primary }}>
-              {secondNumber}
-            </MText>
-            <MText style={{ position: "absolute", top: 0, left: -40 }}>
-              {"X"}
-            </MText>
-          </View>
-
-          <FractionLine w={250} />
-          <FiveDigitInput seed={seed} />
-          <FiveDigitInput seed={seed} disabledIndex={4} />
-          <FractionLine w={250} />
-          <FiveDigitInput onDigit={checkAnswer} seed={seed} />
-        </View>
+        <TouchableOpacity
+          style={[
+            sharedStyles.quizButton,
+            { backgroundColor: cardBgTint, zIndex: 10 },
+          ]}
+          onPress={() => {
+            router.push(`/multiplication?id=${id}`);
+          }}
+        >
+          <AntDesign name="appstore-o" size={24} color={`${cardBg}`} />
+        </TouchableOpacity>
+        {firstNumber > 0 && secondNumber > 0 && (
+          <MultiplicationAnimator
+            multiplicand={firstNumber}
+            multiplier={secondNumber}
+          />
+        )}
       </View>
     </>
   );

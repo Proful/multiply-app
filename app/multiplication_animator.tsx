@@ -33,8 +33,9 @@ configureReanimatedLogger({
 // Constants
 const CONSTANTS = {
   SPACING: 50,
-  BASE_X: 150,
+  BASE_X: 170,
   BASE_Y: 160,
+  LETTER_GAP: 50,
   DIVIDER_START_X: 65,
   DIVIDER_START_Y: 180,
   STEP_HEIGHT: 50,
@@ -135,7 +136,8 @@ const calculatePositionForStep = (
       ? len - currentSteps.length - 1
       : len - currentSteps.length + step1LengthOffset;
 
-  const xOffset = shift === 0 ? 100 : 150;
+  const xOffset =
+    shift === 0 ? 2 * CONSTANTS.LETTER_GAP : 3 * CONSTANTS.LETTER_GAP;
 
   return {
     x: CONSTANTS.BASE_X - xOffset + iOffset * CONSTANTS.SPACING,
@@ -291,14 +293,16 @@ const MultiplicationResultDisplay: React.FC<
   MultiplicationResultDisplayProps
 > = ({ result, font, opacity }) => {
   if (!font) return null;
+
   let len = String(result).split("").length;
-  let xOffset = 100;
+
+  let xOffset = 2 * CONSTANTS.LETTER_GAP;
   if (len === 3) {
-    xOffset = 150;
+    xOffset = 3 * CONSTANTS.LETTER_GAP;
   } else if (len === 4) {
-    xOffset = 100;
+    xOffset = 2 * CONSTANTS.LETTER_GAP;
   }
-  l.len = { len, xOffset };
+
   return (
     <Group>
       {String(result)
@@ -306,7 +310,7 @@ const MultiplicationResultDisplay: React.FC<
         .map((char, i) => (
           <SkiaText
             key={`result-${i}`}
-            x={CONSTANTS.BASE_X - xOffset + i * 50}
+            x={CONSTANTS.BASE_X - xOffset + i * CONSTANTS.LETTER_GAP}
             y={CONSTANTS.BASE_Y + CONSTANTS.STEP_HEIGHT * 2 + 50}
             text={char}
             font={font}
@@ -332,7 +336,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
         .map((char, i) => (
           <SkiaText
             key={`multiplicand-${i}`}
-            x={CONSTANTS.BASE_X + i * 50}
+            x={CONSTANTS.BASE_X + i * CONSTANTS.LETTER_GAP}
             y={CONSTANTS.BASE_Y - 40}
             text={char}
             font={font}
@@ -344,7 +348,7 @@ const MultiplicationDisplay: React.FC<MultiplicationDisplayProps> = ({
         .map((char, i) => (
           <SkiaText
             key={`multiplier-${i}`}
-            x={CONSTANTS.BASE_X + i * 50}
+            x={CONSTANTS.BASE_X + i * CONSTANTS.LETTER_GAP}
             y={CONSTANTS.BASE_Y}
             text={char}
             font={font}
@@ -423,7 +427,7 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
 }) => {
   const steps = calculateSteps(multiplicand, multiplier);
   const [currentStep, setCurrentStep] = useState(-1);
-  const [isAnimating, setIsAnimating] = useState(false);
+  // const [isAnimating, setIsAnimating] = useState(false);
   const [fontLoaded, setFontLoaded] = useState(false);
 
   const opacitiesForStep = steps.map(() => useSharedValue(0));
@@ -468,7 +472,15 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
   };
 
   const font = useFont(require("../assets/BlexMonoNerdFont-Regular.ttf"), 24);
-
+  const { animateStep, isAnimating } = useAnimateStep(
+    fontLoaded,
+    steps,
+    opacitiesForStep,
+    opacitiesForWriteDown,
+    xy,
+    opacityForResult,
+    CONSTANTS,
+  );
   useEffect(() => {
     if (font) {
       setFontLoaded(true);
@@ -477,7 +489,7 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
 
   const setup = useCallback(() => {
     setCurrentStep(-1);
-    setIsAnimating(false);
+    // setIsAnimating(false);
   }, [multiplicand, multiplier]);
 
   useFocusEffect(
@@ -485,6 +497,15 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
       setup();
     }, [setup]),
   );
+
+  useEffect(() => {
+    const cleanup = animateStep(currentStep);
+    return () => {
+      if (cleanup) {
+        cleanup();
+      }
+    };
+  }, [currentStep]);
 
   useEffect(() => {
     if (
@@ -497,44 +518,44 @@ const MultiplicationAnimator: React.FC<MultiplicationAnimatorProps> = ({
     }
   }, [currentStep, isAnimating, steps, fontLoaded]);
 
-  const animateStep = useCallback(
-    (stepIndex: number) => {
-      if (!fontLoaded) return;
-
-      setIsAnimating(true);
-
-      let t = CONSTANTS.ANIMATION_DURATION;
-      let t1 = t;
-      let d1 = t1 + t1 + t;
-      let sd = t1 + t1 + d1 + t1 + t;
-
-      opacitiesForStep[stepIndex].value = withSequence(
-        // t1 => each step along with carry to appear
-        withTiming(1, { duration: t1 }, () => {
-          // t1 => in parallel (writeDown text to appear and text movement)
-          opacitiesForWriteDown[stepIndex].value = withTiming(1, {
-            duration: t1,
-          });
-          xy[stepIndex].value = withTiming(1, { duration: t1 });
-        }),
-        // d1 => delay before step fade out (t1 + t1 + t)
-        // t1 => step to fade out
-        withDelay(
-          d1,
-          withTiming(0, { duration: t1 }, () => {
-            if (stepIndex === steps.length - 1) {
-              opacityForResult.value = withTiming(1, { duration: t1 });
-            }
-          }),
-        ),
-      );
-
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, sd);
-    },
-    [currentStep, fontLoaded],
-  );
+  // const animateStep = useCallback(
+  //   (stepIndex: number) => {
+  //     if (!fontLoaded) return;
+  //
+  //     setIsAnimating(true);
+  //
+  //     let t = CONSTANTS.ANIMATION_DURATION;
+  //     let t1 = t;
+  //     let d1 = t1 + t1 + t;
+  //     let sd = t1 + t1 + d1 + t1 + t;
+  //
+  //     opacitiesForStep[stepIndex].value = withSequence(
+  //       // t1 => each step along with carry to appear
+  //       withTiming(1, { duration: t1 }, () => {
+  //         // t1 => in parallel (writeDown text to appear and text movement)
+  //         opacitiesForWriteDown[stepIndex].value = withTiming(1, {
+  //           duration: t1,
+  //         });
+  //         xy[stepIndex].value = withTiming(1, { duration: t1 });
+  //       }),
+  //       // d1 => delay before step fade out (t1 + t1 + t)
+  //       // t1 => step to fade out
+  //       withDelay(
+  //         d1,
+  //         withTiming(0, { duration: t1 }, () => {
+  //           if (stepIndex === steps.length - 1) {
+  //             opacityForResult.value = withTiming(1, { duration: t1 });
+  //           }
+  //         }),
+  //       ),
+  //     );
+  //
+  //     setTimeout(() => {
+  //       setIsAnimating(false);
+  //     }, sd);
+  //   },
+  //   [currentStep, fontLoaded],
+  // );
 
   const nextStep = () => {
     if (isAnimating || !fontLoaded) return;
@@ -588,3 +609,71 @@ const styles = StyleSheet.create({
 });
 
 export default MultiplicationAnimator;
+
+const useAnimateStep = (
+  fontLoaded: boolean,
+  steps: any[],
+  opacitiesForStep: any[],
+  opacitiesForWriteDown: any[],
+  xy: any[],
+  opacityForResult: { value: number },
+  CONSTANTS: { ANIMATION_DURATION: number },
+) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const animateStep = useCallback(
+    (stepIndex: number) => {
+      if (!fontLoaded) return;
+      if (!opacitiesForStep[stepIndex]) return;
+
+      setIsAnimating(true);
+
+      // Create a cleanup function for the animation
+      let animationCleanup: NodeJS.Timeout;
+
+      const cleanupAnimation = () => {
+        if (animationCleanup) {
+          clearTimeout(animationCleanup);
+        }
+        setIsAnimating(false);
+      };
+
+      const t = CONSTANTS.ANIMATION_DURATION;
+      const t1 = t;
+      const d1 = t1 + t1 + t;
+      const sd = t1 + t1 + d1 + t1 + t;
+
+      opacitiesForStep[stepIndex].value = withSequence(
+        // Step 1: Appear with carry
+        withTiming(1, { duration: t1 }, () => {
+          // Step 2: Show write-down text and movement in parallel
+          opacitiesForWriteDown[stepIndex].value = withTiming(1, {
+            duration: t1,
+          });
+          xy[stepIndex].value = withTiming(1, { duration: t1 });
+        }),
+        // Step 3: Delay before fade out
+        // Step 4: Fade out
+        withDelay(
+          d1,
+          withTiming(0, { duration: t1 }, () => {
+            if (stepIndex === steps.length - 1) {
+              opacityForResult.value = withTiming(1, { duration: t1 });
+            }
+          }),
+        ),
+      );
+
+      // Set the cleanup timeout
+      animationCleanup = setTimeout(() => {
+        setIsAnimating(false);
+      }, sd);
+
+      // Return cleanup function for useEffect
+      return cleanupAnimation;
+    },
+    [fontLoaded, steps.length],
+  );
+
+  return { animateStep, isAnimating };
+};
