@@ -52,6 +52,15 @@ export default function App() {
         >
           <AntDesign name="form" size={24} color={`${cardBg}`} />
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[sharedStyles.quizButton, { backgroundColor: cardBgTint }]}
+          onPress={() => {
+            router.navigate("/quiz/multiplication");
+          }}
+        >
+          <AntDesign name="appstore-o" size={24} color={`${cardBg}`} />
+        </TouchableOpacity>
         {firstNumber > 0 && secondNumber > 0 && (
           <MultiplicationAnimator
             multiplicand={firstNumber}
