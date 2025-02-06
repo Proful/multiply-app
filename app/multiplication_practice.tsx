@@ -67,7 +67,6 @@ export default function Multiplication() {
 
   const cardBg = colors.card[+(id as string) % 10] || "tomato";
 
-  l.multiplication = { id, cardBg };
   if (!loaded && !error) {
     return null;
   }

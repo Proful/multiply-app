@@ -1,48 +1,26 @@
 import { colors, sharedStyles } from "@/lib/styles";
 import { router, useFocusEffect } from "expo-router";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
-import { darkenColor, getRandomNumber } from "@/lib/utils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { darkenColor, getRandomNumber, l } from "@/lib/utils";
 import { useLocalSearchParams } from "expo-router";
 import MultiplicationAnimator from "./multiplication_animator";
 import { AntDesign } from "@expo/vector-icons";
 
-const STORAGE_KEY = "multiplication";
 export default function App() {
   const { id } = useLocalSearchParams();
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
 
+  useEffect(() => {
+    setup();
+  }, []);
+
   const setup = () => {
-    const loadStoredData = async () => {
-      let x = getRandomNumber(10, 99);
-      try {
-        const storedValue = await AsyncStorage.getItem(STORAGE_KEY);
-        if (storedValue) {
-          const { multiplicandDigit } = JSON.parse(storedValue);
-          if (multiplicandDigit === 3) {
-            x = getRandomNumber(100, 999);
-          } else if (multiplicandDigit === 4) {
-            x = getRandomNumber(1000, 9999);
-          } else if (multiplicandDigit === 5) {
-            x = getRandomNumber(10000, 99999);
-          } else {
-            x = getRandomNumber(10, 99);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load data from AsyncStorage:", error);
-      }
-
-      setFirstNumber(x);
-      setSecondNumber(getRandomNumber(10, 99));
-    };
-
-    loadStoredData();
+    setFirstNumber(getRandomNumber(10, 99));
+    setSecondNumber(getRandomNumber(10, 99));
   };
 
-  useFocusEffect(useCallback(setup, []));
   const cardBg = colors.card[+(id as string) % 10];
   const cardBgTint = darkenColor("#ffffff", 0.5);
   return (
@@ -57,14 +35,22 @@ export default function App() {
       >
         <TouchableOpacity
           style={[
-            sharedStyles.quizButton,
-            { backgroundColor: cardBgTint, zIndex: 10 },
+            sharedStyles.practiceButton,
+            {
+              backgroundColor: cardBgTint,
+              zIndex: 10,
+              width: 34,
+              height: 34,
+              borderRadius: 17,
+              justifyContent: "center",
+              alignItems: "center",
+            },
           ]}
           onPress={() => {
-            router.push(`/multiplication?id=${id}`);
+            router.push(`/multiplication_practice?id=${id}`);
           }}
         >
-          <AntDesign name="appstore-o" size={24} color={`${cardBg}`} />
+          <AntDesign name="form" size={24} color={`${cardBg}`} />
         </TouchableOpacity>
         {firstNumber > 0 && secondNumber > 0 && (
           <MultiplicationAnimator

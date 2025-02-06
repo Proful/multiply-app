@@ -298,7 +298,7 @@ const MultiplicationResultDisplay: React.FC<
 
   let xOffset = 2 * CONSTANTS.LETTER_GAP;
   if (len === 3) {
-    xOffset = 3 * CONSTANTS.LETTER_GAP;
+    xOffset = CONSTANTS.LETTER_GAP;
   } else if (len === 4) {
     xOffset = 2 * CONSTANTS.LETTER_GAP;
   }
@@ -639,26 +639,28 @@ const useAnimateStep = (
       };
 
       const t = CONSTANTS.ANIMATION_DURATION;
-      const t1 = t;
-      const d1 = t1 + t1 + t;
-      const sd = t1 + t1 + d1 + t1 + t;
+      const d1 = t + t;
+      const d2 = t + d1 + t + t;
+      const sd = t + t + d2 + t + t;
+
+      const show = (fn?: any) => {
+        return withTiming(1, { duration: t }, fn?.());
+      };
+
+      const hide = (fn?: any) => {
+        return withTiming(0, { duration: t }, fn?.());
+      };
 
       opacitiesForStep[stepIndex].value = withSequence(
-        // Step 1: Appear with carry
-        withTiming(1, { duration: t1 }, () => {
-          // Step 2: Show write-down text and movement in parallel
-          opacitiesForWriteDown[stepIndex].value = withTiming(1, {
-            duration: t1,
-          });
-          xy[stepIndex].value = withTiming(1, { duration: t1 });
+        show(() => {
+          opacitiesForWriteDown[stepIndex].value = withDelay(d1, show());
+          xy[stepIndex].value = withDelay(d1, show());
         }),
-        // Step 3: Delay before fade out
-        // Step 4: Fade out
         withDelay(
-          d1,
-          withTiming(0, { duration: t1 }, () => {
+          d2,
+          hide(() => {
             if (stepIndex === steps.length - 1) {
-              opacityForResult.value = withTiming(1, { duration: t1 });
+              opacityForResult.value = withDelay(d2, show());
             }
           }),
         ),
